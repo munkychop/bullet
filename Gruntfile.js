@@ -16,7 +16,7 @@ module.exports = function (grunt) {
 					"src/js/libs/bullet.js"
 				],
 
-				tasks: ["uglify"]
+				tasks: ["uglify:dist"]
 			}
 		},
 
