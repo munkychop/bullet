@@ -4,7 +4,7 @@
 		var _self = this,
 			_events = {};
 
-		_self.on = function (event, fn)
+		_self.on = function (event, fn, once)
 		{
 			if (arguments.length < 2
 				|| typeof event !== "string"
@@ -12,24 +12,38 @@
 
 			var fnString = fn.toString();
 
+			// if the named event object already exists in the dictionary...
 			if (typeof _events[event] !== "undefined")
 			{
-				// add the callback to the events dictionary if it doesn't exist.
+				// add a callback object to the named event object if one doesn't already exist.
 				if (typeof _events[event].callbacks[fnString] === "undefined")
 				{
-					_events[event].callbacks[fnString] = fn;
+					_events[event].callbacks[fnString] = {
+						cb : fn,
+						once : !!once
+					};
+				}
+				else if (typeof once === "boolean")
+				{
+					// the function already exists, so update it's 'once' value.
+					_events[event].callbacks[fnString].once = once;
 				}
 			}
 			else
 			{
 				// create a new event object in the dictionary with the specified name and callback.
 				_events[event] = {
-					callbacks : {
-						fnString : fn
-					}
-				}
+					callbacks : {}
+				};
+
+				_events[event].callbacks[fnString] = {cb : fn, once : !!once};
 			}
 		};
+
+		_self.once = function (event, fn)
+		{
+			_self.on(event, fn, true);
+		}
 
 		_self.off = function (event, fn)
 		{
@@ -42,9 +56,9 @@
 				var fnString = fn.toString(),
 					fnToRemove = _events[event].callbacks[fnString];
 
-				if (typeof fnToRemove === "function")
+				if (typeof fnToRemove !== "undefined")
 				{
-					// delete the function from the dictionary.
+					// delete the callback object from the dictionary.
 					delete _events[event].callbacks[fnString];
 				}
 			}
@@ -63,9 +77,10 @@
 
 			for (var fnString in _events[event].callbacks)
 			{
-				var cb = _events[event].callbacks[fnString];
+				var callbackObject = _events[event].callbacks[fnString];
 
-				if (typeof cb === "function") cb();
+				if (typeof callbackObject.cb === "function") callbackObject.cb();
+				if (typeof callbackObject.once === "boolean" && callbackObject.once === true) _self.off(event, callbackObject.cb);
 			}
 		}
 
