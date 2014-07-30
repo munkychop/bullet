@@ -70,7 +70,7 @@
 			}
 		};
 
-		_self.trigger = function (event)
+		_self.trigger = function (event, data)
 		{
 			if (typeof event !== "string" ||
 				typeof _events[event] === "undefined") return;
@@ -79,7 +79,7 @@
 			{
 				var callbackObject = _events[event].callbacks[fnString];
 
-				if (typeof callbackObject.cb === "function") callbackObject.cb();
+				if (typeof callbackObject.cb === "function") callbackObject.cb(data);
 				if (typeof callbackObject.once === "boolean" && callbackObject.once === true) _self.off(event, callbackObject.cb);
 			}
 		};
