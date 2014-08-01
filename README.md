@@ -1,7 +1,7 @@
 #Bullet
 
 Bullet is an ultra lightweight and simple to use pub-sub library, with AMD/module support and an intuitive API.
-It was built to facilitate a simple and consistent system of communication across web applications and includes only the bare essentials typically needed to acheive this.
+It was built to facilitate a simple and consistent system of communication across web applications and includes only the bare essentials typically needed to achieve this.
 
 ###Usage
 Firstly, grab either the [minified](https://raw.githubusercontent.com/munkychop/bullet/master/dist/bullet.min.js), or [non-minified](https://raw.githubusercontent.com/munkychop/bullet/master/src/js/libs/bullet.js) source from Github, or install via Bower using the following command in your command prompt:
@@ -146,7 +146,7 @@ This function behaves in the same way as the the **'on'** function, except that 
 ####**.trigger()**
     Bullet.trigger("someMessageName"[, data]);
 
-This function will call all callback functions registered against the specified message, optionally passing in a custom data as a payload.
+This function will call all callback functions registered against the specified message, optionally passing in custom data as a payload.
 
 **Example usage:**
     
