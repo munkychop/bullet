@@ -192,6 +192,6 @@ This function will call all callback functions registered against the specified 
     
     
     // Trigger the 'user-added' message – Bullet will call the 'helloCallback' function and
-    // pass in the custom data that you created, which will sent to the function be as a parameter:
+    // pass in the custom data that you created, which will be sent to the function as a parameter:
     
     Bullet.trigger("user-added", customData);
