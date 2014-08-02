@@ -16,7 +16,7 @@ module.exports = function (grunt) {
 					"src/js/libs/bullet.js"
 				],
 
-				tasks: ["uglify:dist"]
+				tasks: ["default"]
 			}
 		},
 
@@ -34,6 +34,15 @@ module.exports = function (grunt) {
 				src : ["src/js/libs/bullet.js"],
 				dest : "dist/bullet.min.js"
 			}
+		},
+
+		copy : {
+			
+			dist : {
+
+				src : "src/js/libs/bullet.js",
+				dest : "dist/bullet.js"
+			}
 		}
 	});
 
@@ -46,5 +55,5 @@ module.exports = function (grunt) {
 	// =============
 
 	// Register the default task for building the project.
-	grunt.registerTask("default", ["uglify:dist"]);
+	grunt.registerTask("default", ["uglify:dist", "copy:dist"]);
 };
