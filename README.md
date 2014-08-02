@@ -4,7 +4,7 @@ Bullet is an ultra lightweight and simple to use pub-sub library, with AMD/modul
 It was built to facilitate a simple and consistent system of communication across web applications and includes only the bare essentials typically needed to achieve this.
 
 ###Usage
-Firstly, grab either the [minified](https://raw.githubusercontent.com/munkychop/bullet/master/dist/bullet.min.js), or [non-minified](https://raw.githubusercontent.com/munkychop/bullet/master/src/js/libs/bullet.js) source from Github, or install via Bower using the following command in your command prompt:
+Firstly, grab either the [minified](https://raw.githubusercontent.com/munkychop/bullet/master/dist/bullet.min.js), or [non-minified](https://raw.githubusercontent.com/munkychop/bullet/master/dist/bullet.js) source from Github, or install via Bower using the following command in your command prompt:
 
     bower install bullet
 
