@@ -1,12 +1,12 @@
 {
   "name": "bullet",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/munkychop/bullet",
   "authors": [
     "Ivan Hayes <@munkychop>"
   ],
   "description": "Bullet is an ultra lightweight and simple to use pub-sub library.",
-  "main": ["dist/bullet.min.js", "src/js/libs/bullet.js"],
+  "main": ["dist/bullet.js", "dist/bullet.min.js"],
   "keywords": [
     "bullet",
     "javascript",
