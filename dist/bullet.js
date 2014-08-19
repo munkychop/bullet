@@ -86,7 +86,7 @@
 
 	};
 
-	// check for AMD/Module support, otherwise define SwiftClick as a global variable.
+	// check for AMD/Module support, otherwise define Bullet as a global variable.
 	if (typeof define !== "undefined" && define.amd)
 	{
 		// AMD. Register as an anonymous module.
