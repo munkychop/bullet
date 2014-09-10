@@ -1,6 +1,6 @@
 {
   "name": "bullet",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "homepage": "https://github.com/munkychop/bullet",
   "authors": [
     "Ivan Hayes <@munkychop>"
@@ -9,9 +9,11 @@
   "main": ["dist/bullet.js", "dist/bullet.min.js"],
   "keywords": [
     "bullet",
+    "bullet-pubsub",
     "javascript",
     "library",
     "pub-sub",
+    "pubsub",
     "events",
     "communication"
   ],
