@@ -1,14 +1,34 @@
 {
-  "name": "bullet",
+  "name": "bullet-pubsub",
   "title": "Bullet",
   "description": "An ultra lightweight and simple to use pub-sub library.",
-  "url": "https://github.com/munkychop/bullet",
+  "version": "1.1.0",
+  "homepage": "https://github.com/munkychop/bullet",
+  "author": {
+    "name": "Ivan Hayes",
+    "url": "http://www.ivanhayes.com"
+  },
+  "main": "dist/bullet.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:munkychop/bullet.git"
+    "url": "git://github.com/munkychop/bullet.git"
   },
-  "version": "0.0.1",
+  "keywords": [
+    "bullet",
+    "bullet-pubsub",
+    "javascript",
+    "library",
+    "pub-sub",
+    "pubsub",
+    "events",
+    "communication"
+  ],  
   "private": false,
+  "licenses": [
+  {
+    "type": "MIT",
+    "url": "https://github.com/tmwagency/swiftclick/blob/master/license.txt"
+  }],
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-copy": "~0.5.0",

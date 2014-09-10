@@ -1,0 +1,5 @@
+.npmignore
+dist/bullet.min.js
+src
+bower.json
+Gruntfile.js
