@@ -46,9 +46,7 @@ Register a callback function to get called whenever the specified message is tri
 function helloCallback () {
     console.log("hello there :)");
 }
-```   
-
-```javascript    
+ 
 // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
     
 Bullet.on("hello", helloCallback);
