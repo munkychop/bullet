@@ -5,8 +5,7 @@
 
 		_self.on = function (event, fn, once) {
 			if (arguments.length < 2 ||
-				typeof event !== "string" ||
-				typeof fn !== "function") return;
+				typeof event !== "string" || typeof fn !== "function") return;
 
 			var fnString = fn.toString();
 
