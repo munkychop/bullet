@@ -3,6 +3,10 @@
 		var _self = this,
 			_events = {};
 
+		/**
+		 *  Assign a function to run when 'event' is triggered using Bullet.trigger.
+		 *  Assigning more functions to this object 
+		 */
 		_self.on = function (event, fn, once) {
 			if (arguments.length < 2 ||
 				typeof event !== "string" || typeof fn !== "function") return;
@@ -63,6 +67,20 @@
 				if (typeof callbackObject.once === "boolean" && callbackObject.once === true) 
 					_self.off(event, callbackObject.cb);
 			}
+		};
+		
+		_self.clearAll = function () {
+			_events = {};
+		};
+		
+		/**
+		 * Replace all fn run for a given event with the single given fn. 
+		 */
+		_self.replace = function (event, fn, once) {
+			if (typeof event !== "string" || typeof _events[event] === "undefined") return;
+
+			_self.off(event);
+			_self.on(event, fn, once);
 		};
 
 	};
