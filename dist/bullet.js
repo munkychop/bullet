@@ -78,7 +78,6 @@
 		 */
 		_self.replace = function (event, fn, once) {
 			if (typeof event !== "string" || typeof _events[event] === "undefined") return;
-
 			_self.off(event);
 			_self.on(event, fn, once);
 		};
