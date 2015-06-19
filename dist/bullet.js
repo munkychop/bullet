@@ -95,7 +95,75 @@
 				}
 			}
 		};
-		
+
+		/**
+		 * Trigger multiple events simultaneously. Example:
+		 *     _self.multitrigger({
+		 *        "event1": {
+		 *              "key1": "val1"
+		 *              "someKey2": "someVal2"
+		 *        },
+		 *        "event2": ""
+		 *     });
+		 * ...triggers event2 with no data passed, & event1 with a data object
+		 */
+		_self.multitrigger = function ( eventDataPairs ) 
+		{
+			if (typeof eventDataPairs !== 'object') return;
+			var events = Object.keys( eventDataPairs );
+
+			events.forEach(function(event)
+			{
+				if (typeof eventDataPairs[event] !== 'undefined') 
+				{
+					_self.trigger(event, eventDataPairs[event]);
+				}
+				else
+				{
+					_self.trigger(event);
+				}
+			});
+		};
+
+		/**
+		 * Set multiple events simultaneously. Example:
+		 *     _self.on_setMultiple({
+		 *        "name-of-event": {
+		 *              fn: function() {
+		 *                alert("name-of-event has run!");
+		 *              },
+		 *              once: false,
+		 *        },
+		 *        "another-event": {
+		 *              fn: function() {
+		 *                alert("another-event has run!");
+		 *              },
+		 *              once: true,
+		 *        }
+		 *    });
+		 */
+		_self.on_setMultiple = function ( eventCollection ) 
+		{
+			if (typeof eventCollection !== 'object') return;
+			var events = Object.keys( eventCollection );
+
+			events.forEach(function(event)
+			{
+				if (typeof eventCollection[event].once === 'undefined')
+				{
+					eventCollection[event].once = false;
+				}
+                
+				if (typeof eventCollection[event].fn === "function" && 
+					typeof event === "string") 
+				{
+					_self.on(event, eventCollection[event].fn, 
+							 eventCollection[event].once);                    
+				}
+
+            });
+        };
+
 		_self.clearAll = function () 
 		{
 			_events = {};
