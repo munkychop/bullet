@@ -232,6 +232,53 @@ var customData = {
 Bullet.trigger("user-added", customData);
 ```
 
+
+#### **.on_setMultiple()**
+
+```javascript
+Bullet.on_setMultiple("someMessageName"[, configObject]);
+```
+
+Set multiple events at once, using a configuration object;
+
+**Example usage:**
+
+```javascript
+Bullet.on_setMultiple({
+    "name-of-event": {
+        fn: function() 
+        {
+            alert("name-of-event ran!");
+        },
+        once: false,
+    },
+    "name-of-event-2: {
+        fn: function() 
+        {
+            alert("name-of-event-2 ran!");
+        },
+        once: true
+    }
+}
+
+
+// Somewhere later in the application...
+
+// Trigger the messages – Bullet will call the associated functions
+
+Bullet.trigger("name-of-event"); //triggers alert box containing "name-of-event ran!"
+
+Bullet.trigger("name-of-event-2"); //triggers alert box containing "name-of-event-2 ran!"
+
+Bullet.trigger("name-of-event"); //triggers alert box containing "name-of-event ran!" again
+
+Bullet.trigger("name-of-event-2"); //no result - this event was set to run only once.
+
+```
+
+
+
+
 ## About the Project
 Bullet was developed and is currently maintained by [Ivan Hayes](https://twitter.com/munkychop).
 
