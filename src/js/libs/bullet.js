@@ -75,13 +75,16 @@
 			if (typeof event !== "string" ||
 				typeof _events[event] === "undefined") return;
 
-			for (var fnString in _events[event].callbacks)
+			setTimeout(function ()
 			{
-				var callbackObject = _events[event].callbacks[fnString];
+				for (var fnString in _events[event].callbacks)
+				{
+					var callbackObject = _events[event].callbacks[fnString];
 
-				if (typeof callbackObject.cb === "function") callbackObject.cb(data);
-				if (typeof callbackObject.once === "boolean" && callbackObject.once === true) _self.off(event, callbackObject.cb);
-			}
+					if (typeof callbackObject.cb === "function") callbackObject.cb(data);
+					if (typeof callbackObject.once === "boolean" && callbackObject.once === true) _self.off(event, callbackObject.cb);
+				}
+			}, 0);
 		};
 
 	};
