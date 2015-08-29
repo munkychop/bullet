@@ -1,59 +1,66 @@
 module.exports = function (grunt) {
 
-	"use strict";
+	'use strict';
+
+	var jsSrcFile = 'src/bullet.js';
+	var jsDistDir = 'dist/';
+	var testDir = 'test/spec/';
 
 	grunt.initConfig({
 
-		/**
-		 * Watch
-		 * https://github.com/gruntjs/grunt-contrib-watch
-		 * Watches your scss, js etc for changes and compiles them
-		 */
 		watch : {
 
 			js: {
 				files: [
-					"src/js/libs/bullet.js"
+					jsSrcFile
 				],
 
-				tasks: ["default"]
+				tasks: ['dist']
 			}
 		},
 
+		simplemocha : {
+
+            options: {
+                timeout: 3000,
+                ignoreLeaks: false,
+            },
+
+            testAll : {
+            	src: testDir + '**/*.js'
+            }
+        },
+
 		uglify : {
 
-			dist : {
-				options : {
-					compress : true,
-					mangle : true,
-					sourceMap : false,
-					preserveComments : false,
-					report : "gzip"
+			options : {
+				compress : {
+					drop_console: true
 				},
+				mangle : true,
+				sourceMap : false,
+				preserveComments : false,
+				report : 'gzip' // TODO : does this report option still work?
+			},
 
-				src : ["src/js/libs/bullet.js"],
-				dest : "dist/bullet.min.js"
+			dist : {
+				src : jsSrcFile,
+				dest : jsDistDir + 'bullet.min.js'
 			}
 		},
 
 		copy : {
-			
-			dist : {
 
-				src : "src/js/libs/bullet.js",
-				dest : "dist/bullet.js"
+			dist : {
+				src : jsSrcFile,
+				dest : jsDistDir + 'bullet.js'
 			}
 		}
 	});
 
+	require('load-grunt-tasks')(grunt, {pattern: ['grunt-*']});
 
-	// Load all the grunt task modules.
-	require("load-grunt-tasks")(grunt, {pattern: ["grunt-*"]});
-
-	// =============
-	// === Tasks ===
-	// =============
-
-	// Register the default task for building the project.
-	grunt.registerTask("default", ["uglify:dist", "copy:dist"]);
+	grunt.registerTask('default', ['simplemocha', 'uglify', 'copy', 'watch']);
+	grunt.registerTask('dist', ['simplemocha', 'uglify', 'copy']);
+	grunt.registerTask('test', ['simplemocha']);
 };
