@@ -1,25 +1,26 @@
 module.exports = function (grunt) {
 
-	'use strict';
+    'use strict';
 
-	var jsSrcFile = 'src/bullet.js';
-	var jsDistDir = 'dist/';
-	var testDir = 'test/spec/';
+    var jsSrcFile = 'src/bullet.js';
+    var jsDistDir = 'dist/';
+    var testDir = 'test/spec/';
 
-	grunt.initConfig({
+    grunt.initConfig({
 
-		watch : {
+        watch : {
 
-			js: {
-				files: [
-					jsSrcFile
-				],
+            js: {
+                files: [
+                    jsSrcFile,
+                    testDir + '**/*.js'
+                ],
 
-				tasks: ['dist']
-			}
-		},
+                tasks: ['dist']
+            }
+        },
 
-		simplemocha : {
+        simplemocha : {
 
             options: {
                 timeout: 3000,
@@ -27,40 +28,40 @@ module.exports = function (grunt) {
             },
 
             testAll : {
-            	src: testDir + '**/*.js'
+                src: testDir + '**/*.js'
             }
         },
 
-		uglify : {
+        uglify : {
 
-			options : {
-				compress : {
-					drop_console: true
-				},
-				mangle : true,
-				sourceMap : false,
-				preserveComments : false,
-				report : 'gzip' // TODO : does this report option still work?
-			},
+            options : {
+                compress : {
+                    drop_console: true
+                },
+                mangle : true,
+                sourceMap : false,
+                preserveComments : false,
+                report : 'gzip' // TODO : does this report option still work?
+            },
 
-			dist : {
-				src : jsSrcFile,
-				dest : jsDistDir + 'bullet.min.js'
-			}
-		},
+            dist : {
+                src : jsSrcFile,
+                dest : jsDistDir + 'bullet.min.js'
+            }
+        },
 
-		copy : {
+        copy : {
 
-			dist : {
-				src : jsSrcFile,
-				dest : jsDistDir + 'bullet.js'
-			}
-		}
-	});
+            dist : {
+                src : jsSrcFile,
+                dest : jsDistDir + 'bullet.js'
+            }
+        }
+    });
 
-	require('load-grunt-tasks')(grunt, {pattern: ['grunt-*']});
+    require('load-grunt-tasks')(grunt, {pattern: ['grunt-*']});
 
-	grunt.registerTask('default', ['simplemocha', 'uglify', 'copy', 'watch']);
-	grunt.registerTask('dist', ['simplemocha', 'uglify', 'copy']);
-	grunt.registerTask('test', ['simplemocha']);
+    grunt.registerTask('default', ['simplemocha', 'uglify', 'copy', 'watch']);
+    grunt.registerTask('dist', ['simplemocha', 'uglify', 'copy']);
+    grunt.registerTask('test', ['simplemocha']);
 };

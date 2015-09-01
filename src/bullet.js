@@ -1,111 +1,140 @@
 (function () {
 
-	'use strict';
-	
-	var BulletClass = function ()
-	{
-		var _self = this,
-			_events = {};
+    'use strict';
+    
+    function Bullet ()
+    {
+        var _self = this;
+        var _events = {
+            dictionary : {},
+            eventNames : {}
+        };
+        var _public = {
+            dictionary : {}
+        };
 
-		_self.on = function (event, fn, once)
-		{
-			if (arguments.length < 2 ||
-				typeof event !== 'string' ||
-				typeof fn !== 'function') return; // TODO : throw an error here, instead of just returning.
+        _self.on = function (event, fn, once)
+        {
+            if (arguments.length < 2 ||
+                typeof event !== 'string' ||
+                typeof fn !== 'function')
+            {
+                return; // TODO : throw an error here, instead of just returning.
+            }
 
-			var fnString = fn.toString();
+            var fnString = fn.toString();
 
-			// if the named event object already exists in the dictionary...
-			if (typeof _events[event] !== 'undefined')
-			{
-				// add a callback object to the named event object if one doesn't already exist.
-				if (typeof _events[event].callbacks[fnString] === 'undefined')
-				{
-					_events[event].callbacks[fnString] = {
-						cb : fn,
-						once : !!once
-					};
-				}
-				else if (typeof once === 'boolean')
-				{
-					// the function already exists, so update it's 'once' value.
-					_events[event].callbacks[fnString].once = once;
-				}
-			}
-			else
-			{
-				// create a new event object in the dictionary with the specified name and callback.
-				_events[event] = {
-					callbacks : {}
-				};
+            // If the named event object already exists in the dictionary...
+            if (typeof _events.dictionary[event] !== 'undefined')
+            {
+                // Add a callback object to the named event object if one doesn't already exist.
+                if (typeof _events.dictionary[event].callbacks[fnString] === 'undefined')
+                {
+                    _events.dictionary[event].callbacks[fnString] = {
+                        cb : fn,
+                        once : !!once
+                    };
 
-				_events[event].callbacks[fnString] = {cb : fn, once : !!once};
-			}
-		};
+                    _events.dictionary[event].totalCallbacks++;
+                }
+                else if (typeof once === 'boolean')
+                {
+                    // The function already exists, so update it's 'once' value.
+                    _events.dictionary[event].callbacks[fnString].once = once;
+                }
+            }
+            else
+            {
+                // Create a new event object in the dictionary with the specified name and callback.
+                _events.dictionary[event] = {
+                    callbacks : {}
+                };
 
-		_self.once = function (event, fn)
-		{
-			_self.on(event, fn, true);
-		};
+                _events.dictionary[event].callbacks[fnString] = {cb : fn, once : !!once};
+                _events.dictionary[event].totalCallbacks = 1;
+            }
+        };
 
-		_self.off = function (event, fn)
-		{
-			if (typeof event !== 'string' ||
-				typeof _events[event] === 'undefined') return;
+        _self.once = function (event, fn)
+        {
+            _self.on(event, fn, true);
+        };
 
-			// remove just the function, if passed as a parameter and in the dictionary.
-			if (typeof fn === 'function')
-			{
-				var fnString = fn.toString(),
-					fnToRemove = _events[event].callbacks[fnString];
+        _self.off = function (event, fn)
+        {
+            if (typeof event !== 'string' ||
+                typeof _events.dictionary[event] === 'undefined') return;
 
-				if (typeof fnToRemove !== 'undefined')
-				{
-					// delete the callback object from the dictionary.
-					delete _events[event].callbacks[fnString];
-				}
-			}
-			else
-			{
-				// delete all functions in the dictionary that are
-				// registered to this event by deleting the named event object.
-				delete _events[event];
-			}
-		};
+            // Remove just the function, if passed as a parameter and in the dictionary.
+            if (typeof fn === 'function')
+            {
+                var fnString = fn.toString(),
+                    fnToRemove = _events.dictionary[event].callbacks[fnString];
 
-		_self.trigger = function (event, data)
-		{
-			if (typeof event !== 'string' ||
-				typeof _events[event] === 'undefined') return;
+                if (typeof fnToRemove !== 'undefined')
+                {
+                    // delete the callback object from the dictionary.
+                    delete _events.dictionary[event].callbacks[fnString];
+                    
+                    _events.dictionary[event].totalCallbacks--;
 
-			for (var fnString in _events[event].callbacks)
-			{
-				var callbackObject = _events[event].callbacks[fnString];
+                    if (_events.dictionary[event].totalCallbacks === 0)
+                    {
+                        // There are no more functions in the dictionary that are
+                        // registered to this event, so delete the named event object.
+                        delete _events.dictionary[event];
+                    }
+                }
+            }
+            else
+            {
+                // Delete all functions in the dictionary that are
+                // registered to this event by deleting the named event object.
+                delete _events.dictionary[event];
+            }
+        };
 
-				if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
-				if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(event, callbackObject.cb);
-			}
-		};
+        _self.trigger = function (event, data)
+        {
+            if (typeof event !== 'string' ||
+                typeof _events.dictionary[event] === 'undefined') return;
 
-	};
+            for (var fnString in _events.dictionary[event].callbacks)
+            {
+                var callbackObject = _events.dictionary[event].callbacks[fnString];
 
-	// check for AMD/Module support, otherwise define Bullet as a global variable.
-	if (typeof define !== 'undefined' && define.amd)
-	{
-		// AMD. Register as an anonymous module.
-		define (function()
-		{
-			return new BulletClass();
-		});
+                if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
+                if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(event, callbackObject.cb);
+            }
+        };
 
-	}
-	else if (typeof module !== 'undefined' && module.exports)
-	{
-		module.exports = new BulletClass();
-	}
-	else
-	{
-		window.Bullet = new BulletClass();
-	}
-	
+        _self.getEventsMap = function () {
+            
+            // Return a dictionary object that has no effect on app state to ensure '_events.dictionary'
+            // stays private, even if the value returned from this method is modified.
+            _public.dictionary = _events.dictionary;
+
+            return _public.dictionary;
+        };
+    }
+
+    // Check for AMD/Module support, otherwise define Bullet as a global variable.
+    if (typeof define !== 'undefined' && define.amd)
+    {
+        // AMD. Register as an anonymous module.
+        define (function()
+        {
+            return new Bullet();
+        });
+
+    }
+    else if (typeof module !== 'undefined' && module.exports)
+    {
+        module.exports = new Bullet();
+    }
+    else
+    {
+        window.Bullet = new Bullet();
+    }
+    
 })();
