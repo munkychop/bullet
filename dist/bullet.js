@@ -19,7 +19,7 @@
                 typeof event !== 'string' ||
                 typeof fn !== 'function')
             {
-                return; // TODO : throw an error here, instead of just returning.
+                return; // TODO : Throw an error here if in strictEventMode, instead of just returning.
             }
 
             var fnString = fn.toString();
@@ -63,7 +63,11 @@
         _self.off = function (event, fn)
         {
             if (typeof event !== 'string' ||
-                typeof _events.dictionary[event] === 'undefined') return;
+                typeof _events.dictionary[event] === 'undefined')
+            {
+                // TODO : Throw an error here if in strictEventMode, instead of just returning.
+                return;
+            }
 
             // Remove just the function, if passed as a parameter and in the dictionary.
             if (typeof fn === 'function')
