@@ -5,12 +5,8 @@
     function Bullet ()
     {
         var _self = this;
-        var _events = {
-            dictionary : {},
-            eventNames : {}
-        };
-        var _public = {
-            dictionary : {}
+        var _dictionary = {
+            mappings : {}
         };
 
         _self.on = function (event, fn, once)
@@ -25,33 +21,33 @@
             var fnString = fn.toString();
 
             // If the named event object already exists in the dictionary...
-            if (typeof _events.dictionary[event] !== 'undefined')
+            if (typeof _dictionary.mappings[event] !== 'undefined')
             {
                 // Add a callback object to the named event object if one doesn't already exist.
-                if (typeof _events.dictionary[event].callbacks[fnString] === 'undefined')
+                if (typeof _dictionary.mappings[event].callbacks[fnString] === 'undefined')
                 {
-                    _events.dictionary[event].callbacks[fnString] = {
+                    _dictionary.mappings[event].callbacks[fnString] = {
                         cb : fn,
                         once : !!once
                     };
 
-                    _events.dictionary[event].totalCallbacks++;
+                    _dictionary.mappings[event].totalCallbacks++;
                 }
                 else if (typeof once === 'boolean')
                 {
                     // The function already exists, so update it's 'once' value.
-                    _events.dictionary[event].callbacks[fnString].once = once;
+                    _dictionary.mappings[event].callbacks[fnString].once = once;
                 }
             }
             else
             {
                 // Create a new event object in the dictionary with the specified name and callback.
-                _events.dictionary[event] = {
+                _dictionary.mappings[event] = {
                     callbacks : {}
                 };
 
-                _events.dictionary[event].callbacks[fnString] = {cb : fn, once : !!once};
-                _events.dictionary[event].totalCallbacks = 1;
+                _dictionary.mappings[event].callbacks[fnString] = {cb : fn, once : !!once};
+                _dictionary.mappings[event].totalCallbacks = 1;
             }
         };
 
@@ -63,7 +59,7 @@
         _self.off = function (event, fn)
         {
             if (typeof event !== 'string' ||
-                typeof _events.dictionary[event] === 'undefined')
+                typeof _dictionary.mappings[event] === 'undefined')
             {
                 // TODO : Throw an error here if in strictEventMode, instead of just returning.
                 return;
@@ -73,20 +69,20 @@
             if (typeof fn === 'function')
             {
                 var fnString = fn.toString(),
-                    fnToRemove = _events.dictionary[event].callbacks[fnString];
+                    fnToRemove = _dictionary.mappings[event].callbacks[fnString];
 
                 if (typeof fnToRemove !== 'undefined')
                 {
                     // delete the callback object from the dictionary.
-                    delete _events.dictionary[event].callbacks[fnString];
+                    delete _dictionary.mappings[event].callbacks[fnString];
                     
-                    _events.dictionary[event].totalCallbacks--;
+                    _dictionary.mappings[event].totalCallbacks--;
 
-                    if (_events.dictionary[event].totalCallbacks === 0)
+                    if (_dictionary.mappings[event].totalCallbacks === 0)
                     {
                         // There are no more functions in the dictionary that are
                         // registered to this event, so delete the named event object.
-                        delete _events.dictionary[event];
+                        delete _dictionary.mappings[event];
                     }
                 }
             }
@@ -94,18 +90,18 @@
             {
                 // Delete all functions in the dictionary that are
                 // registered to this event by deleting the named event object.
-                delete _events.dictionary[event];
+                delete _dictionary.mappings[event];
             }
         };
 
         _self.trigger = function (event, data)
         {
             if (typeof event !== 'string' ||
-                typeof _events.dictionary[event] === 'undefined') return;
+                typeof _dictionary.mappings[event] === 'undefined') return;
 
-            for (var fnString in _events.dictionary[event].callbacks)
+            for (var fnString in _dictionary.mappings[event].callbacks)
             {
-                var callbackObject = _events.dictionary[event].callbacks[fnString];
+                var callbackObject = _dictionary.mappings[event].callbacks[fnString];
 
                 if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
                 if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(event, callbackObject.cb);
@@ -114,11 +110,17 @@
 
         _self.getEventsMap = function () {
             
-            // Return a dictionary object that has no effect on app state to ensure '_events.dictionary'
+            // Return a dictionary object that has no effect on app state to ensure '_dictionary.mappings'
             // stays private, even if the value returned from this method is modified.
-            _public.dictionary = _events.dictionary;
 
-            return _public.dictionary;
+            var publicMappings = {};
+
+            for (var mapping in _dictionary.mappings)
+            {
+                publicMappings[mapping] = _dictionary.mappings[mapping];
+            }
+
+            return publicMappings;
         };
     }
 
