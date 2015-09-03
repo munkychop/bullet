@@ -40,6 +40,14 @@ describe('Bullet', function () {
         it('should have a method named "once"', function () {
             expect(this.bullet.once).to.be.a('function');
         });
+
+        it('should have a method named "addEvent"', function () {
+            expect(this.bullet.addEvent).to.be.a('function');
+        });
+
+        it('should have a method named "removeEvent"', function () {
+            expect(this.bullet.removeEvent).to.be.a('function');
+        });
     });
 
     describe('Method Implementation', function () {
