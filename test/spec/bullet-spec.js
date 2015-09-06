@@ -41,6 +41,10 @@ describe('Bullet', function () {
             expect(this.bullet.once).to.be.a('function');
         });
 
+        it('should have a public method named "getEvents"', function () {
+            expect(this.bullet.getEvents).to.be.a('function');
+        });
+
         it('should have a public method named "addEvent"', function () {
             expect(this.bullet.addEvent).to.be.a('function');
         });
