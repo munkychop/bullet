@@ -4,9 +4,57 @@
     
     function Bullet ()
     {
+        // ------------------------------------------------------------------------------------------
+        // -- Private properties
+        // ------------------------------------------------------------------------------------------
         var _self = this;
         var _mappings = {};
+        var _strictEvents = {};
 
+        // ------------------------------------------------------------------------------------------
+        // -- Public properties
+        // ------------------------------------------------------------------------------------------
+
+
+        // ------------------------------------------------------------------------------------------
+        // -- Private methods
+        // ------------------------------------------------------------------------------------------
+        _self._getMappings = function () {
+            
+            // Return a dictionary object that has no effect on app state to ensure '_mappings'
+            // stays private, even if the value returned from this method is modified.
+
+            var publicMappings = {};
+
+            for (var mapping in _mappings)
+            {             
+                publicMappings[mapping] = {
+                    callbacks : _cloneCallbacks(_mappings[mapping].callbacks),
+                    totalCallbacks : _mappings[mapping].totalCallbacks
+                };
+            }
+
+            return publicMappings;
+        };
+
+        function _cloneCallbacks (callbacks) {
+            var clonedCallbacks = {};
+
+            for (var callbackName in callbacks) {
+                
+                clonedCallbacks[callbackName] = {
+                    cb : callbacks[callbackName].cb,
+                    once : callbacks[callbackName].once
+                };
+            }
+
+            return clonedCallbacks;
+        }
+
+
+        // ------------------------------------------------------------------------------------------
+        // -- Public methods
+        // ------------------------------------------------------------------------------------------
         _self.on = function (event, fn, once)
         {
             if (arguments.length < 2 ||
@@ -106,23 +154,51 @@
             }
         };
 
-        _self.getMappings = function () {
-            
-            // Return a dictionary object that has no effect on app state to ensure '_mappings'
-            // stays private, even if the value returned from this method is modified.
+        _self.getEvents = function () {
 
-            var publicMappings = {};
+            // Ensure '_strictEvents' stays private by returning a clone of the object.
+            var clonedEvents = JSON.parse(JSON.stringify(_strictEvents));
 
-            for (var mapping in _mappings)
+            return clonedEvents;
+        };
+
+        _self.addEvent = function (eventName) {
+
+            if (typeof eventName !== 'string')
             {
-                publicMappings[mapping] = _mappings[mapping];
+                throw new TypeError('Bullet:: [addEvent] expected event name parameter to be a string, but received type: ' + typeof eventName);
+                // return early due to TypeError;
+            }
+            else if (eventName.length === 0)
+            {
+                throw new Error('Bullet:: [addEvent] expected event name parameter to be longer than 0 characters');
             }
 
-            return publicMappings;
+            _strictEvents[eventName] = eventName;
+        };
+
+        _self.removeEvent = function (eventName) {
+
+            if (typeof eventName !== 'string')
+            {
+                throw new TypeError('Bullet:: [removeEvent] expected event name parameter to be a string, but received type: ' + typeof eventName);
+                // return early due to TypeError;
+            }
+             else if (eventName.length === 0)
+            {
+                throw new Error('Bullet:: [removeEvent] expected event name parameter to be longer than 0 characters');
+            }
+
+            if (_strictEvents[eventName]) delete _strictEvents[eventName];
         };
     }
 
+
+    // ------------------------------------------------------------------------------------------
+    // -- Module definition
+    // ------------------------------------------------------------------------------------------
     // Check for AMD/Module support, otherwise define Bullet as a global variable.
+
     if (typeof define !== 'undefined' && define.amd)
     {
         // AMD. Register as an anonymous module.

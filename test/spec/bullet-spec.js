@@ -21,31 +21,31 @@ describe('Bullet', function () {
             this.bullet = new BulletClass();
         });
 
-        it('should have a method named "getMappings"', function () {
-            expect(this.bullet.getMappings).to.be.a('function');
+        it('should have a private method named "_getMappings"', function () {
+            expect(this.bullet._getMappings).to.be.a('function');
         });
 
-        it('should have a method named "on"', function () {
+        it('should have a public method named "on"', function () {
             expect(this.bullet.on).to.be.a('function');
         });
 
-        it('should have a method named "off"', function () {
+        it('should have a public method named "off"', function () {
             expect(this.bullet.off).to.be.a('function');
         });
 
-        it('should have a method named "trigger"', function () {
+        it('should have a public method named "trigger"', function () {
             expect(this.bullet.trigger).to.be.a('function');
         });
 
-        it('should have a method named "once"', function () {
+        it('should have a public method named "once"', function () {
             expect(this.bullet.once).to.be.a('function');
         });
 
-        it('should have a method named "addEvent"', function () {
+        it('should have a public method named "addEvent"', function () {
             expect(this.bullet.addEvent).to.be.a('function');
         });
 
-        it('should have a method named "removeEvent"', function () {
+        it('should have a public method named "removeEvent"', function () {
             expect(this.bullet.removeEvent).to.be.a('function');
         });
     });
@@ -59,18 +59,18 @@ describe('Bullet', function () {
             this.testCallback = function testCallback () {};
         });
 
-        describe('getMappings()', function () {
+        describe('_getMappings()', function () {
 
             it('should return the public state of the internal "_mappings" object', function () {
 
-                var mappings = this.bullet.getMappings();
+                var mappings = this.bullet._getMappings();
                 expect(mappings).to.deep.equal({});
 
                 // Add a property to the returned mappings object.
                 mappings.foo = 'bar';
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
                 
                 // Bullet's internal mappings should not have been modified.
                 expect(mappings).to.deep.equal({});
@@ -81,7 +81,7 @@ describe('Bullet', function () {
 
             it('should create a mapping for the specified event name', function () {
 
-                var mappings = this.bullet.getMappings();
+                var mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('undefined');
 
@@ -89,7 +89,7 @@ describe('Bullet', function () {
                 this.bullet.on(this.testEventName, this.testCallback);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('object');
                 expect(mappings[this.testEventName].callbacks).to.be.an('object');
@@ -103,26 +103,26 @@ describe('Bullet', function () {
             it('should not create a mapping if only one parameter is passed', function () {
 
                 // The map should start empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
 
                 // Attempt to add an event with only one param.
                 this.bullet.on(this.testEventName);
 
                 // The map should be empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
             // TODO : It should really throw an Error here. The 'on' method needs updating.
             it('should not create a mapping if no parameters are passed', function () {
 
                 // The map should start empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
 
                 // Attempt to add an event with no params.
                 this.bullet.on();
 
                 // The map should still be empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
             });
         });
 
@@ -144,7 +144,7 @@ describe('Bullet', function () {
                 var someOtherCallbackString = this.someOtherCallback.toString();
 
                 // Get the events map.
-                var mappings = this.bullet.getMappings();
+                var mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
                 expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
@@ -153,7 +153,7 @@ describe('Bullet', function () {
                 this.bullet.off(this.testEventName, this.testCallback);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('undefined');
                 expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
@@ -162,7 +162,7 @@ describe('Bullet', function () {
                 this.bullet.off(this.testEventName, this.someOtherCallback);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 // The map should be empty, now that all event mappings have been removed.
                 expect(mappings).to.deep.equal({});
@@ -181,7 +181,7 @@ describe('Bullet', function () {
                 var someOtherCallbackString = this.someOtherCallback.toString();
 
                 // Get the events map.
-                var mappings = this.bullet.getMappings();
+                var mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
                 expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
@@ -192,7 +192,7 @@ describe('Bullet', function () {
                 this.bullet.off(this.testEventName);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('undefined');
                 expect(mappings[this.someOtherEventName].callbacks[testCallbackString]).to.be.an('object');
@@ -202,7 +202,7 @@ describe('Bullet', function () {
                 this.bullet.off(this.someOtherEventName);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 expect(mappings[this.someOtherEventName]).to.be.an('undefined');
             });
@@ -249,7 +249,7 @@ describe('Bullet', function () {
 
             it('should create a one-time mapping for the specified event name', function () {
 
-                var mappings = this.bullet.getMappings();
+                var mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('undefined');
 
@@ -257,7 +257,7 @@ describe('Bullet', function () {
                 this.bullet.once(this.testEventName, this.testCallback);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('object');
                 expect(mappings[this.testEventName].callbacks).to.be.an('object');
@@ -266,7 +266,7 @@ describe('Bullet', function () {
                 this.bullet.trigger(this.testEventName);
 
                 // Get the updated events map.
-                mappings = this.bullet.getMappings();
+                mappings = this.bullet._getMappings();
 
                 // The event mapping should have been deleted, as it was triggered once.
                 expect(mappings[this.testEventName]).to.be.an('undefined');
@@ -276,26 +276,155 @@ describe('Bullet', function () {
             it('should not create a mapping if only one parameter is passed', function () {
 
                 // The map should start empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
 
                 // Attempt to add an event with only one param.
                 this.bullet.once(this.testEventName);
 
                 // The map should be empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
             // TODO : It should really throw an Error here. The 'on' method needs updating.
             it('should not create a mapping if no parameters are passed', function () {
 
                 // The map should start empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
 
                 // Attempt to add an event with no params.
                 this.bullet.once();
 
                 // The map should still be empty
-                expect(this.bullet.getMappings()).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+        });
+
+        describe('getEvents()', function () {
+
+            it('should return the current state of the internal "_strictEvents" object', function () {
+
+                var events = this.bullet.getEvents();
+                
+                // The map should start empty
+                expect(events).to.deep.equal({});
+
+                // Add a property to the returned events object.
+                events.foo = 'bar';
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+                
+                // Bullet's internal events object should not have been modified.
+                expect(events).to.deep.equal({});
+            });
+        });
+        
+        describe('addEvent()', function () {
+
+            it('should add an event to the internal "_strictEvents" object', function () {
+
+                var events = this.bullet.getEvents();
+                
+                // The map should start empty
+                expect(events).to.deep.equal({});
+
+                // Add an event.
+                this.bullet.addEvent('foo');
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+                
+                // Bullet's internal _events should not have been modified.
+                expect(events).to.deep.equal({foo : 'foo'});
+
+                // Add another event.
+                this.bullet.addEvent('bar');
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+                
+                // Bullet's internal _events should not have been modified.
+                expect(events).to.deep.equal({foo : 'foo', bar : 'bar'});
+            });
+
+            it('should throw a TypeError if the passed parameter is not a string', function () {
+
+                var self = this;
+
+                function callAddEvent() {
+                    self.bullet.addEvent({hello : 'hi'});
+                }
+
+                expect(callAddEvent).to.throw(TypeError);
+            });
+
+            it('should throw an Error if the passed string parameter length is 0', function () {
+
+                var self = this;
+
+                function callAddEvent() {
+                    self.bullet.addEvent('');
+                }
+
+                expect(callAddEvent).to.throw(Error);
+            });
+        });
+
+        describe('removeEvent()', function () {
+
+            it('should remove an event from the internal "_strictEvents" object', function () {
+
+                var events = this.bullet.getEvents();
+                
+                // Add multiple events so that we can test the removal of a single event.
+                this.bullet.addEvent('foo');
+                this.bullet.addEvent('bar');
+                this.bullet.addEvent('baz');
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+                
+                expect(events).to.deep.equal({foo : 'foo', bar : 'bar', baz : 'baz'});
+
+                // Remove one of the events.
+                this.bullet.removeEvent('bar');
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+
+                expect(events).to.deep.equal({foo : 'foo', baz : 'baz'});
+                
+                // Remove the remaining events.
+                this.bullet.removeEvent('foo');
+                this.bullet.removeEvent('baz');
+
+                // Get the updated events map.
+                events = this.bullet.getEvents();
+
+                // The map should start empty
+                expect(events).to.deep.equal({});
+            });
+        
+            it('should throw a TypeError if the passed parameter is not a string', function () {
+
+                var self = this;
+
+                function callRemoveEvent() {
+                    self.bullet.removeEvent({hello : 'hi'});
+                }
+
+                expect(callRemoveEvent).to.throw(TypeError);
+            });
+
+            it('should throw an Error if the passed string parameter length is 0', function () {
+
+                var self = this;
+
+                function callRemoveEvent() {
+                    self.bullet.removeEvent('');
+                }
+
+                expect(callRemoveEvent).to.throw(Error);
             });
         });
     });
