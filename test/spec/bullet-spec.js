@@ -52,6 +52,14 @@ describe('Bullet', function () {
         it('should have a public method named "removeEvent"', function () {
             expect(this.bullet.removeEvent).to.be.a('function');
         });
+
+        it('should have a public method named "getStrictMode"', function () {
+            expect(this.bullet.getStrictMode).to.be.a('function');
+        });
+
+        it('should have a public method named "setStrictMode"', function () {
+            expect(this.bullet.setStrictMode).to.be.a('function');
+        });
     });
 
     describe('Method Implementation', function () {
@@ -431,5 +439,11 @@ describe('Bullet', function () {
                 expect(callRemoveEvent).to.throw(Error);
             });
         });
+
+        // describe('setStrictMode()', function () {
+
+        //     it('should remove an event from the internal "_strictEvents" object', function () {
+
+        //         var events = this.bullet.getEvents();
     });
 });
