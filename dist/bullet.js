@@ -1,19 +1,18 @@
 (function () {
 
     'use strict';
+
+    // TODO : create private vars for Errors/TypeErrors, instead of creating them on-the-fly.
     
     function Bullet ()
     {
         // ------------------------------------------------------------------------------------------
-        // -- Private properties
+        // -- Private member variables
         // ------------------------------------------------------------------------------------------
         var _self = this;
         var _mappings = {};
         var _strictEvents = {};
-
-        // ------------------------------------------------------------------------------------------
-        // -- Public properties
-        // ------------------------------------------------------------------------------------------
+        var _strictMode = false;
 
 
         // ------------------------------------------------------------------------------------------
@@ -24,17 +23,17 @@
             // Return a dictionary object that has no effect on app state to ensure '_mappings'
             // stays private, even if the value returned from this method is modified.
 
-            var publicMappings = {};
+            var clonedMappings = {};
 
             for (var mapping in _mappings)
             {             
-                publicMappings[mapping] = {
+                clonedMappings[mapping] = {
                     callbacks : _cloneCallbacks(_mappings[mapping].callbacks),
                     totalCallbacks : _mappings[mapping].totalCallbacks
                 };
             }
 
-            return publicMappings;
+            return clonedMappings;
         };
 
         function _cloneCallbacks (callbacks) {
@@ -57,11 +56,36 @@
         // ------------------------------------------------------------------------------------------
         _self.on = function (event, fn, once)
         {
-            if (arguments.length < 2 ||
-                typeof event !== 'string' ||
-                typeof fn !== 'function')
+            if (arguments.length < 2 || arguments.length > 3)
             {
-                return; // TODO : Throw an error here if in strictEventMode, instead of just returning.
+                if (_strictMode) throw new Error('Bullet:: [on] expected between 2 and 3 parameters, but received: ' + arguments.length);
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof event !== 'string')
+            {
+                if (_strictMode) throw new TypeError('Bullet:: [on] expected "event" parameter to be a string, but received: ' + typeof event);
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof event.length === 0)
+            {
+                if (_strictMode) throw new Error('Bullet:: [on] expected "event" parameter to be greater than 0 characters');
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof fn !== 'function')
+            {
+                if (_strictMode) throw new TypeError('Bullet:: [on] expected "fn" parameter to be a function, but received: ' + typeof event);
+
+                // Return if not in strict mode.
+                return;
             }
 
             var fnString = fn.toString();
@@ -99,15 +123,63 @@
 
         _self.once = function (event, fn)
         {
+            if (arguments.length !== 2)
+            {
+                if (_strictMode) throw new Error('Bullet:: [once] expected 2 parameters, but received: ' + arguments.length);
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof event !== 'string')
+            {
+                if (_strictMode) throw new TypeError('Bullet:: [once] expected "event" parameter to be a string, but received: ' + typeof event);
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof event.length === 0)
+            {
+                if (_strictMode) throw new Error('Bullet:: [once] expected "event" parameter to be greater than 0 characters');
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof fn !== 'function')
+            {
+                if (_strictMode) throw new TypeError('Bullet:: [once] expected "fn" parameter to be a function, but received: ' + typeof event);
+
+                // Return if not in strict mode.
+                return;
+            }
+
             _self.on(event, fn, true);
         };
 
         _self.off = function (event, fn)
         {
-            if (typeof event !== 'string' ||
-                typeof _mappings[event] === 'undefined')
+            if (arguments.length === 0)
+            {
+                // TODO : Remove all mappings??
+
+                return;
+            }
+
+            if (typeof event !== 'string')
             {
                 // TODO : Throw an error here if in strictEventMode, instead of just returning.
+
+                // Return if not in strict mode.
+                return;
+            }
+
+            if (typeof _mappings[event] === 'undefined')
+            {
+                // TODO : Throw an error here if in strictEventMode, instead of just returning.
+
+                // Return if not in strict mode.
                 return;
             }
 
@@ -142,8 +214,17 @@
 
         _self.trigger = function (event, data)
         {
-            if (typeof event !== 'string' ||
-                typeof _mappings[event] === 'undefined') return;
+            if (typeof event !== 'string')
+            {
+                // TODO : Throw TypeError.
+                return;
+            }
+            
+            if (typeof _mappings[event] === 'undefined')
+            {
+                // TODO : Throw Error (event does not exist)
+                return;
+            }
 
             for (var fnString in _mappings[event].callbacks)
             {
@@ -191,6 +272,30 @@
 
             if (_strictEvents[eventName]) delete _strictEvents[eventName];
         };
+
+        _self.getStrictMode = function () {
+
+            // Return a boolean that doesn't directly point to the internal '_strictMode' property.
+            return _strictMode === true ? true : false;
+        };
+
+        _self.setStrictMode = function (useStrictMode) {
+
+            if (typeof useStrictMode !== 'boolean') throw new TypeError('Bullet:: [setStrictMode] expected parameter "useStrictMode" to be a boolean, but received type: ' + typeof useStrictMode);
+
+            _strictMode = useStrictMode;
+        };
+
+        // TODO : Create an 'addMultipleEvents' method with a flat object passed as a param.
+        // - include type checks for string while looping over the object (and use hasOwnProperty!).
+
+        // TODO : Create a 'replaceAllEvents' method with an object passed as a param.
+        // - include type checks for string while looping over the object (and use hasOwnProperty!).
+
+        // TODO : Create a 'removeAllEvents' method. No params necessary.
+
+        // TODO : Create an 'onMultiple' method with an array of strings passed as the first param.
+        // - include type checks for string while looping over the array.
     }
 
 
