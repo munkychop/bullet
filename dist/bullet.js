@@ -1,41 +1,118 @@
 (function () {
 
     'use strict';
-
-    // TODO : create private vars for Errors/TypeErrors, instead of creating them on-the-fly.
     
     function Bullet ()
     {
         // ------------------------------------------------------------------------------------------
-        // -- Private member variables
+        // -- Custom Errors
+        // ------------------------------------------------------------------------------------------
+        function ParamCountError (methodName, expectedParamsString, paramCount) {
+            
+            this.message = 'Bullet:: [' + methodName + '] ' + expectedParamsString + ', but received: ' + paramCount;
+            var error = new Error(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        ParamCountError.prototype = new Error();
+        ParamCountError.prototype.name = ParamCountError.name;
+        ParamCountError.prototype.constructor = ParamCountError;
+
+
+        function EventNameTypeError (methodName, eventName) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Expected event name parameter to be a string, but received type: ' + typeof eventName;
+            var error = new TypeError(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        EventNameTypeError.prototype = new TypeError();
+        EventNameTypeError.prototype.name = EventNameTypeError.name;
+        EventNameTypeError.prototype.constructor = EventNameTypeError;
+
+
+        function CallbackTypeError (methodName, callback) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Expected callback parameter to be a function, but received type: ' + typeof callback;
+            var error = new TypeError(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        CallbackTypeError.prototype = new TypeError();
+        CallbackTypeError.prototype.name = CallbackTypeError.name;
+        CallbackTypeError.prototype.constructor = CallbackTypeError;
+
+
+        function StrictModeSetterTypeError (methodName, callback) {
+            
+            this.message = 'Bullet:: [setStrictMode] Expected parameter to be a boolean, but received type: ' + typeof callback;
+            var error = new TypeError(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        StrictModeSetterTypeError.prototype = new TypeError();
+        StrictModeSetterTypeError.prototype.name = StrictModeSetterTypeError.name;
+        StrictModeSetterTypeError.prototype.constructor = StrictModeSetterTypeError;
+
+
+        function EventNameLengthError (methodName) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Expected event name parameter to be longer than 0 characters';
+            var error = new Error(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        EventNameLengthError.prototype = new Error();
+        EventNameLengthError.prototype.name = EventNameLengthError.name;
+        EventNameLengthError.prototype.constructor = EventNameLengthError;
+
+
+        function UndeclaredEventError (methodName, eventName) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" does not exist within the events dictionary\nPlease use the Bullet.addEvent method to add this string.';
+
+            var error = new Error(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        UndeclaredEventError.prototype = new Error();
+        UndeclaredEventError.prototype.name = UndeclaredEventError.name;
+        UndeclaredEventError.prototype.constructor = UndeclaredEventError;
+
+
+        function UnmappedEventError (methodName, eventName) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" is not mapped to any callbacks\nPlease use the Bullet.on method to map this string to a callback.';
+
+            var error = new Error(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        UnmappedEventError.prototype = new Error();
+        UnmappedEventError.prototype.name = UnmappedEventError.name;
+        UnmappedEventError.prototype.constructor = UnmappedEventError;
+
+
+        // ------------------------------------------------------------------------------------------
+        // -- Private variables
         // ------------------------------------------------------------------------------------------
         var _self = this;
         var _mappings = {};
-        var _strictEvents = {};
         var _strictMode = false;
 
+        // Expose custom error type constructors (for testing), but use an underscore to imply privacy.
+        _self._errors = {
+            ParamCountError : ParamCountError,
+            EventNameTypeError : EventNameTypeError,
+            CallbackTypeError : CallbackTypeError,
+            EventNameLengthError : EventNameLengthError,
+            UndeclaredEventError : UndeclaredEventError,
+            UnmappedEventError : UnmappedEventError,
+            StrictModeSetterTypeError : StrictModeSetterTypeError
+        };
+
+
+        // ------------------------------------------------------------------------------------------
+        // -- Public variables
+        // ------------------------------------------------------------------------------------------
+        _self.events = {};
 
         // ------------------------------------------------------------------------------------------
         // -- Private methods
         // ------------------------------------------------------------------------------------------
-        _self._getMappings = function () {
-            
-            // Return a dictionary object that has no effect on app state to ensure '_mappings'
-            // stays private, even if the value returned from this method is modified.
-
-            var clonedMappings = {};
-
-            for (var mapping in _mappings)
-            {             
-                clonedMappings[mapping] = {
-                    callbacks : _cloneCallbacks(_mappings[mapping].callbacks),
-                    totalCallbacks : _mappings[mapping].totalCallbacks
-                };
-            }
-
-            return clonedMappings;
-        };
-
         function _cloneCallbacks (callbacks) {
             var clonedCallbacks = {};
 
@@ -50,136 +127,137 @@
             return clonedCallbacks;
         }
 
+        // Expose _getMappings method (for testing), but use an underscore to imply privacy.
+        _self._getMappings = function () {
+            
+            // Return a dictionary object that has no effect on app state to ensure '_mappings'
+            // stays private, even if the value returned from this method is modified.
+            var clonedMappings = {};
+
+            for (var mapping in _mappings)
+            {             
+                clonedMappings[mapping] = {
+                    callbacks : _cloneCallbacks(_mappings[mapping].callbacks),
+                    totalCallbacks : _mappings[mapping].totalCallbacks
+                };
+            }
+
+            return clonedMappings;
+        };
+
 
         // ------------------------------------------------------------------------------------------
         // -- Public methods
         // ------------------------------------------------------------------------------------------
-        _self.on = function (event, fn, once)
+        _self.on = function (eventName, fn, once)
         {
             if (arguments.length < 2 || arguments.length > 3)
             {
-                if (_strictMode) throw new Error('Bullet:: [on] expected between 2 and 3 parameters, but received: ' + arguments.length);
-
-                // Return if not in strict mode.
-                return;
+                throw new ParamCountError('on', 'Expected between 2 and 3 parameters', arguments.length);
             }
 
-            if (typeof event !== 'string')
+            if (typeof eventName !== 'string')
             {
-                if (_strictMode) throw new TypeError('Bullet:: [on] expected "event" parameter to be a string, but received: ' + typeof event);
-
-                // Return if not in strict mode.
-                return;
+                throw new EventNameTypeError('on', eventName);
             }
-
-            if (typeof event.length === 0)
+            else if (eventName.length === 0)
             {
-                if (_strictMode) throw new Error('Bullet:: [on] expected "event" parameter to be greater than 0 characters');
-
-                // Return if not in strict mode.
-                return;
+                throw new EventNameLengthError('on');
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('on', eventName);
             }
 
             if (typeof fn !== 'function')
             {
-                if (_strictMode) throw new TypeError('Bullet:: [on] expected "fn" parameter to be a function, but received: ' + typeof event);
-
-                // Return if not in strict mode.
-                return;
+                throw new CallbackTypeError('on', fn);
             }
 
             var fnString = fn.toString();
 
             // If the named event object already exists in the dictionary...
-            if (typeof _mappings[event] !== 'undefined')
+            if (typeof _mappings[eventName] !== 'undefined')
             {
                 // Add a callback object to the named event object if one doesn't already exist.
-                if (typeof _mappings[event].callbacks[fnString] === 'undefined')
+                if (typeof _mappings[eventName].callbacks[fnString] === 'undefined')
                 {
-                    _mappings[event].callbacks[fnString] = {
+                    _mappings[eventName].callbacks[fnString] = {
                         cb : fn,
                         once : !!once
                     };
 
-                    _mappings[event].totalCallbacks++;
+                    _mappings[eventName].totalCallbacks++;
                 }
                 else if (typeof once === 'boolean')
                 {
                     // The function already exists, so update it's 'once' value.
-                    _mappings[event].callbacks[fnString].once = once;
+                    _mappings[eventName].callbacks[fnString].once = once;
                 }
             }
             else
             {
                 // Create a new event object in the dictionary with the specified name and callback.
-                _mappings[event] = {
+                _mappings[eventName] = {
                     callbacks : {}
                 };
 
-                _mappings[event].callbacks[fnString] = {cb : fn, once : !!once};
-                _mappings[event].totalCallbacks = 1;
+                _mappings[eventName].callbacks[fnString] = {cb : fn, once : !!once};
+                _mappings[eventName].totalCallbacks = 1;
             }
         };
 
-        _self.once = function (event, fn)
+        _self.once = function (eventName, fn)
         {
             if (arguments.length !== 2)
             {
-                if (_strictMode) throw new Error('Bullet:: [once] expected 2 parameters, but received: ' + arguments.length);
-
-                // Return if not in strict mode.
-                return;
+                throw new ParamCountError('once', 'Expected 2 parameters', arguments.length);
             }
-
-            if (typeof event !== 'string')
+            else if (typeof eventName !== 'string')
             {
-                if (_strictMode) throw new TypeError('Bullet:: [once] expected "event" parameter to be a string, but received: ' + typeof event);
-
-                // Return if not in strict mode.
-                return;
+                throw new EventNameTypeError('on', eventName);
             }
-
-            if (typeof event.length === 0)
+            else if (eventName.length === 0)
             {
-                if (_strictMode) throw new Error('Bullet:: [once] expected "event" parameter to be greater than 0 characters');
-
-                // Return if not in strict mode.
-                return;
+                throw new EventNameLengthError('once');
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('once', eventName);
             }
 
             if (typeof fn !== 'function')
             {
-                if (_strictMode) throw new TypeError('Bullet:: [once] expected "fn" parameter to be a function, but received: ' + typeof event);
-
-                // Return if not in strict mode.
-                return;
+                throw new CallbackTypeError('once', fn);
             }
 
-            _self.on(event, fn, true);
+            _self.on(eventName, fn, true);
         };
 
-        _self.off = function (event, fn)
+        _self.off = function (eventName, fn)
         {
             if (arguments.length === 0)
             {
                 // TODO : Remove all mappings??
-
+                // For now we'll just silently return immediately.
                 return;
             }
-
-            if (typeof event !== 'string')
+            else if (typeof eventName !== 'string')
             {
-                // TODO : Throw an error here if in strictEventMode, instead of just returning.
-
-                // Return if not in strict mode.
-                return;
+                throw new EventNameTypeError('off', eventName);
+            }
+            else if (eventName.length === 0)
+            {
+                throw new EventNameLengthError('off');
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('off', eventName);
             }
 
-            if (typeof _mappings[event] === 'undefined')
+            if (typeof _mappings[eventName] === 'undefined')
             {
-                // TODO : Throw an error here if in strictEventMode, instead of just returning.
-
-                // Return if not in strict mode.
+                // There is no mapping to remove, so return silently.
                 return;
             }
 
@@ -187,90 +265,93 @@
             if (typeof fn === 'function')
             {
                 var fnString = fn.toString(),
-                    fnToRemove = _mappings[event].callbacks[fnString];
+                    fnToRemove = _mappings[eventName].callbacks[fnString];
 
                 if (typeof fnToRemove !== 'undefined')
                 {
                     // delete the callback object from the dictionary.
-                    delete _mappings[event].callbacks[fnString];
+                    delete _mappings[eventName].callbacks[fnString];
                     
-                    _mappings[event].totalCallbacks--;
+                    _mappings[eventName].totalCallbacks--;
 
-                    if (_mappings[event].totalCallbacks === 0)
+                    if (_mappings[eventName].totalCallbacks === 0)
                     {
                         // There are no more functions in the dictionary that are
                         // registered to this event, so delete the named event object.
-                        delete _mappings[event];
+                        delete _mappings[eventName];
                     }
                 }
             }
+            else if (typeof fn !== 'undefined')
+            {
+                throw new CallbackTypeError('off', fn);
+            }
             else
             {
-                // Delete all functions in the dictionary that are
-                // registered to this event by deleting the named event object.
-                delete _mappings[event];
+                // No callback was passed, so delete all functions in the dictionary that
+                // are registered to this event by deleting the named event object.
+                delete _mappings[eventName];
             }
         };
 
-        _self.trigger = function (event, data)
+        _self.trigger = function (eventName, data)
         {
-            if (typeof event !== 'string')
+            if (typeof eventName !== 'string')
             {
-                // TODO : Throw TypeError.
-                return;
+                throw new EventNameTypeError('trigger', eventName);
+            }
+            else if (eventName.length === 0)
+            {
+                throw new EventNameLengthError('trigger');
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('trigger', eventName);
             }
             
-            if (typeof _mappings[event] === 'undefined')
+            if (typeof _mappings[eventName] === 'undefined')
             {
-                // TODO : Throw Error (event does not exist)
+                if (_strictMode) throw new UnmappedEventError('trigger', eventName);
+
+                // Return silently if not in strict mode.
                 return;
             }
 
-            for (var fnString in _mappings[event].callbacks)
+            for (var fnString in _mappings[eventName].callbacks)
             {
-                var callbackObject = _mappings[event].callbacks[fnString];
+                var callbackObject = _mappings[eventName].callbacks[fnString];
 
                 if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
-                if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(event, callbackObject.cb);
+                if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
             }
-        };
-
-        _self.getEvents = function () {
-
-            // Ensure '_strictEvents' stays private by returning a clone of the object.
-            var clonedEvents = JSON.parse(JSON.stringify(_strictEvents));
-
-            return clonedEvents;
         };
 
         _self.addEvent = function (eventName) {
 
             if (typeof eventName !== 'string')
             {
-                throw new TypeError('Bullet:: [addEvent] expected event name parameter to be a string, but received type: ' + typeof eventName);
-                // return early due to TypeError;
+                throw new EventNameTypeError('addEvent', eventName);
             }
             else if (eventName.length === 0)
             {
-                throw new Error('Bullet:: [addEvent] expected event name parameter to be longer than 0 characters');
+                throw new EventNameLengthError('addEvent');
             }
 
-            _strictEvents[eventName] = eventName;
+            _self.events[eventName] = eventName;
         };
 
         _self.removeEvent = function (eventName) {
 
             if (typeof eventName !== 'string')
             {
-                throw new TypeError('Bullet:: [removeEvent] expected event name parameter to be a string, but received type: ' + typeof eventName);
-                // return early due to TypeError;
+                throw new EventNameTypeError('removeEvent', eventName);
             }
              else if (eventName.length === 0)
             {
-                throw new Error('Bullet:: [removeEvent] expected event name parameter to be longer than 0 characters');
+                throw new EventNameLengthError('removeEvent');
             }
 
-            if (_strictEvents[eventName]) delete _strictEvents[eventName];
+            if (_self.events[eventName]) delete _self.events[eventName];
         };
 
         _self.getStrictMode = function () {
@@ -281,7 +362,7 @@
 
         _self.setStrictMode = function (useStrictMode) {
 
-            if (typeof useStrictMode !== 'boolean') throw new TypeError('Bullet:: [setStrictMode] expected parameter "useStrictMode" to be a boolean, but received type: ' + typeof useStrictMode);
+            if (typeof useStrictMode !== 'boolean') throw new StrictModeSetterTypeError(useStrictMode);
 
             _strictMode = useStrictMode;
         };
