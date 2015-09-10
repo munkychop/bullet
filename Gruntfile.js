@@ -4,6 +4,7 @@ module.exports = function (grunt) {
 
     var jsSrcFile = 'src/bullet.js';
     var jsDistDir = 'dist/';
+    var jsExampleLibsDir = 'example/js/libs/';
     var testDir = 'test/spec/';
 
     grunt.initConfig({
@@ -55,6 +56,11 @@ module.exports = function (grunt) {
             dist : {
                 src : jsSrcFile,
                 dest : jsDistDir + 'bullet.js'
+            },
+
+            example : {
+                src : jsSrcFile,
+                dest : jsExampleLibsDir + 'bullet.js'
             }
         }
     });
