@@ -14,6 +14,54 @@ chai.use(sinonChai);
 
 describe('Bullet', function () {
 
+    describe('Custom Error Existence', function () {
+        
+        before(function () {
+
+            this.bullet = new BulletClass();
+        });
+
+        it('should have custom error type "ParamCountError"', function () {
+            expect(this.bullet._errors.ParamCountError).to.be.a('function');
+        });
+
+        it('should have custom error type "EventNameTypeError"', function () {
+            expect(this.bullet._errors.EventNameTypeError).to.be.a('function');
+        });
+
+        it('should have custom error type "CallbackTypeError"', function () {
+            expect(this.bullet._errors.CallbackTypeError).to.be.a('function');
+        });
+
+        it('should have custom error type "EventNameLengthError"', function () {
+            expect(this.bullet._errors.EventNameLengthError).to.be.a('function');
+        });
+
+        it('should have custom error type "UndeclaredEventError"', function () {
+            expect(this.bullet._errors.UndeclaredEventError).to.be.a('function');
+        });
+
+        it('should have custom error type "UnmappedEventError"', function () {
+            expect(this.bullet._errors.UnmappedEventError).to.be.a('function');
+        });
+
+        it('should have custom error type "StrictModeSetterTypeError"', function () {
+            expect(this.bullet._errors.StrictModeSetterTypeError).to.be.a('function');
+        });
+    });
+
+    describe('Property Existence', function () {
+        
+        before(function () {
+
+            this.bullet = new BulletClass();
+        });
+
+        it('should have a public property named "events"', function () {
+            expect(this.bullet.events).to.be.an('object');
+        });
+    });
+
     describe('Method Existence', function () {
         
         before(function () {
@@ -39,10 +87,6 @@ describe('Bullet', function () {
 
         it('should have a public method named "once"', function () {
             expect(this.bullet.once).to.be.a('function');
-        });
-
-        it('should have a public method named "getEvents"', function () {
-            expect(this.bullet.getEvents).to.be.a('function');
         });
 
         it('should have a public method named "addEvent"', function () {
@@ -87,7 +131,7 @@ describe('Bullet', function () {
                 // Bullet's internal mappings should not have been modified.
                 expect(mappings).to.deep.equal({});
             });
-        });
+        }); // [_getMappings]
 
         describe('on()', function () {
 
@@ -111,32 +155,121 @@ describe('Bullet', function () {
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
             });
 
-            // TODO : It should really throw an Error here. The 'on' method needs updating.
-            it('should not create a mapping if only one parameter is passed', function () {
+            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+
+                var self = this;
 
                 // The map should start empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
 
-                // Attempt to add an event with only one param.
-                this.bullet.on(this.testEventName);
+                function callOn () {
 
-                // The map should be empty
-                expect(this.bullet._getMappings()).to.deep.equal({});
-            });
+                    // Attempt to map an event with a non-string event name parameter.
+                    self.bullet.on({}, self.testCallback);
+                }
 
-            // TODO : It should really throw an Error here. The 'on' method needs updating.
-            it('should not create a mapping if no parameters are passed', function () {
-
-                // The map should start empty
-                expect(this.bullet._getMappings()).to.deep.equal({});
-
-                // Attempt to add an event with no params.
-                this.bullet.on();
+                expect(callOn).to.throw(this.bullet._errors.EventNameTypeError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
-        });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event with an empty string as the event name parameter.
+                    self.bullet.on('', self.testCallback);
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.EventNameLengthError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event with a non-function as the callback parameter.
+                    self.bullet.on(self.testEventName, {});
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.CallbackTypeError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw a ParamCountError if only one parameter is passed', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event with only one parameter.
+                    self.bullet.on(self.testEventName);
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.ParamCountError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw a ParamCountError if no parameters are passed', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event with no params.
+                    self.bullet.on();
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.ParamCountError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw a ParamCountError if more than three parameters are passed', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event with more than three params.
+                    self.bullet.on(self.testEventName, self.testCallback, true, 123);
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.ParamCountError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+        }); // [on]
+
 
         describe('off()', function () {
 
@@ -218,7 +351,49 @@ describe('Bullet', function () {
 
                 expect(mappings[this.someOtherEventName]).to.be.an('undefined');
             });
-        });
+
+            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+
+                var self = this;
+
+                function callOff () {
+
+                    // Attempt to unmap an event with a non-string event name parameter.
+                    self.bullet.off({}, self.testCallback);
+                }
+
+                expect(callOff).to.throw(this.bullet._errors.EventNameTypeError);
+            });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                function callOff () {
+
+                    // Attempt to unmap an event with an empty string as the event name parameter.
+                    self.bullet.off('', self.testCallback);
+                }
+
+                expect(callOff).to.throw(this.bullet._errors.EventNameLengthError);
+            });
+
+            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+
+                var self = this;
+
+                // Map an event via the 'on' method so that we can attempt to remove it below.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callOff () {
+
+                    // Attempt to unmap an event with a non-function as the callback parameter.
+                    self.bullet.off(self.testEventName, {});
+                }
+
+                expect(callOff).to.throw(this.bullet._errors.CallbackTypeError);
+            });
+        }); // [off]
 
         describe('trigger()', function () {
 
@@ -253,9 +428,34 @@ describe('Bullet', function () {
                 this.bullet.trigger(this.testEventName, testData);
 
                 expect(this.testCallback).to.have.been.calledWith(testData);
-
             });
-        });
+
+            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+
+                var self = this;
+
+                function callTrigger () {
+
+                    // Attempt to trigger an event with a non-string event name parameter.
+                    self.bullet.trigger({});
+                }
+
+                expect(callTrigger).to.throw(this.bullet._errors.EventNameTypeError);
+            });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                function callTrigger () {
+
+                    // Attempt to trigger an event with an empty string as the event name parameter.
+                    self.bullet.trigger('');
+                }
+
+                expect(callTrigger).to.throw(this.bullet._errors.EventNameLengthError);
+            });
+        }); // [trigger]
 
         describe('once()', function () {
 
@@ -284,58 +484,126 @@ describe('Bullet', function () {
                 expect(mappings[this.testEventName]).to.be.an('undefined');
             });
 
-            // TODO : It should really throw an Error here. The 'on' method needs updating.
-            it('should not create a mapping if only one parameter is passed', function () {
+            it('should throw a ParamCountError if no parameters are passed', function () {
+
+                var self = this;
 
                 // The map should start empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
 
-                // Attempt to add an event with only one param.
-                this.bullet.once(this.testEventName);
+                function callOnce () {
 
-                // The map should be empty
-                expect(this.bullet._getMappings()).to.deep.equal({});
-            });
+                    // Attempt to map an event with no params.
+                    self.bullet.once();
+                }
 
-            // TODO : It should really throw an Error here. The 'on' method needs updating.
-            it('should not create a mapping if no parameters are passed', function () {
-
-                // The map should start empty
-                expect(this.bullet._getMappings()).to.deep.equal({});
-
-                // Attempt to add an event with no params.
-                this.bullet.once();
+                expect(callOnce).to.throw(this.bullet._errors.ParamCountError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
-        });
 
-        describe('getEvents()', function () {
+            it('should throw an ParamCountError if only one parameter is passed', function () {
 
-            it('should return the current state of the internal "_strictEvents" object', function () {
+                var self = this;
 
-                var events = this.bullet.getEvents();
-                
                 // The map should start empty
-                expect(events).to.deep.equal({});
+                expect(this.bullet._getMappings()).to.deep.equal({});
 
-                // Add a property to the returned events object.
-                events.foo = 'bar';
+                function callOnce () {
 
-                // Get the updated events map.
-                events = this.bullet.getEvents();
-                
-                // Bullet's internal events object should not have been modified.
-                expect(events).to.deep.equal({});
+                    // Attempt to map an event with only one parameter.
+                    self.bullet.once(self.testEventName);
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.ParamCountError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
             });
-        });
+
+            it('should throw an ParamCountError if more than three parameters are passed', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Attempt to map an event with more than three params.
+                    self.bullet.once(self.testEventName, self.testCallback, true, 123);
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.ParamCountError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Attempt to map an event with a non-string event name parameter.
+                    self.bullet.once({}, self.testCallback);
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.EventNameTypeError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Attempt to map an event with an empty string as the event name parameter.
+                    self.bullet.once('', self.testCallback);
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.EventNameLengthError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+
+                var self = this;
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Attempt to map an event with a non-function as the callback parameter.
+                    self.bullet.once(self.testEventName, {});
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.CallbackTypeError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+        }); // [once]
         
         describe('addEvent()', function () {
 
             it('should add an event to the internal "_strictEvents" object', function () {
 
-                var events = this.bullet.getEvents();
+                var events = this.bullet.events;
                 
                 // The map should start empty
                 expect(events).to.deep.equal({});
@@ -344,7 +612,7 @@ describe('Bullet', function () {
                 this.bullet.addEvent('foo');
 
                 // Get the updated events map.
-                events = this.bullet.getEvents();
+                events = this.bullet.events;
                 
                 // Bullet's internal _events should not have been modified.
                 expect(events).to.deep.equal({foo : 'foo'});
@@ -353,40 +621,40 @@ describe('Bullet', function () {
                 this.bullet.addEvent('bar');
 
                 // Get the updated events map.
-                events = this.bullet.getEvents();
+                events = this.bullet.events;
                 
                 // Bullet's internal _events should not have been modified.
                 expect(events).to.deep.equal({foo : 'foo', bar : 'bar'});
             });
 
-            it('should throw a TypeError if the passed parameter is not a string', function () {
+            it('should throw an EventNameTypeError if the passed parameter is not a string', function () {
 
                 var self = this;
 
-                function callAddEvent() {
+                function callAddEvent () {
                     self.bullet.addEvent({hello : 'hi'});
                 }
 
-                expect(callAddEvent).to.throw(TypeError);
+                expect(callAddEvent).to.throw(this.bullet._errors.EventNameTypeError);
             });
 
-            it('should throw an Error if the passed string parameter length is 0', function () {
+            it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
 
                 var self = this;
 
-                function callAddEvent() {
+                function callAddEvent () {
                     self.bullet.addEvent('');
                 }
 
-                expect(callAddEvent).to.throw(Error);
+                expect(callAddEvent).to.throw(this.bullet._errors.EventNameLengthError);
             });
-        });
+        }); // [addEvent]
 
         describe('removeEvent()', function () {
 
             it('should remove an event from the internal "_strictEvents" object', function () {
 
-                var events = this.bullet.getEvents();
+                var events = this.bullet.events;
                 
                 // Add multiple events so that we can test the removal of a single event.
                 this.bullet.addEvent('foo');
@@ -394,7 +662,7 @@ describe('Bullet', function () {
                 this.bullet.addEvent('baz');
 
                 // Get the updated events map.
-                events = this.bullet.getEvents();
+                events = this.bullet.events;
                 
                 expect(events).to.deep.equal({foo : 'foo', bar : 'bar', baz : 'baz'});
 
@@ -402,7 +670,7 @@ describe('Bullet', function () {
                 this.bullet.removeEvent('bar');
 
                 // Get the updated events map.
-                events = this.bullet.getEvents();
+                events = this.bullet.events;
 
                 expect(events).to.deep.equal({foo : 'foo', baz : 'baz'});
                 
@@ -411,39 +679,327 @@ describe('Bullet', function () {
                 this.bullet.removeEvent('baz');
 
                 // Get the updated events map.
-                events = this.bullet.getEvents();
+                events = this.bullet.events;
 
                 // The map should start empty
                 expect(events).to.deep.equal({});
             });
         
-            it('should throw a TypeError if the passed parameter is not a string', function () {
+            it('should throw an EventNameTypeError if the passed parameter is not a string', function () {
 
                 var self = this;
 
-                function callRemoveEvent() {
+                function callRemoveEvent () {
                     self.bullet.removeEvent({hello : 'hi'});
                 }
 
-                expect(callRemoveEvent).to.throw(TypeError);
+                expect(callRemoveEvent).to.throw(this.bullet._errors.EventNameTypeError);
             });
 
-            it('should throw an Error if the passed string parameter length is 0', function () {
+            it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
 
                 var self = this;
 
-                function callRemoveEvent() {
+                function callRemoveEvent () {
                     self.bullet.removeEvent('');
                 }
 
-                expect(callRemoveEvent).to.throw(Error);
+                expect(callRemoveEvent).to.throw(this.bullet._errors.EventNameLengthError);
             });
+        }); // [removeEvent]
+    });
+
+    describe('Strict Mode Method Implementation', function () {
+
+        beforeEach(function () {
+
+            this.bullet = new BulletClass();
+            this.testEventName = 'hello there';
+            this.testCallback = function testCallback () {};
         });
 
-        // describe('setStrictMode()', function () {
+        describe('getStrictMode()', function () {
 
-        //     it('should remove an event from the internal "_strictEvents" object', function () {
+            it('should return the boolean value of the private "_strictMode" property', function () {
 
-        //         var events = this.bullet.getEvents();
+                expect(this.bullet.getStrictMode()).to.be.a('boolean');
+            });
+
+            it('should be false by default', function () {
+
+                expect(this.bullet.getStrictMode()).to.equal(false);
+            });
+        }); // [getStrictMode]
+
+        describe('setStrictMode()', function () {
+
+            it('should set the private "_strictMode" property to a boolean value', function () {
+
+                // It should be false by default.
+                expect(this.bullet.getStrictMode()).to.equal(false);
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                expect(this.bullet.getStrictMode()).to.equal(true);
+
+                // Turn off strict mode.
+                this.bullet.setStrictMode(false);
+
+                expect(this.bullet.getStrictMode()).to.equal(false);
+            });
+
+            it('should throw a StrictModeSetterTypeError if a non-boolean value is passed as the parameter', function () {
+
+                var self = this;
+
+                // It should be false by default.
+                expect(this.bullet.getStrictMode()).to.equal(false);
+
+                function callSetStrictMode () {
+
+                    // Call setStrictMode and pass in a non-boolean value.
+                    self.bullet.setStrictMode({});
+                }
+
+                expect(callSetStrictMode).to.throw(this.bullet._errors.StrictModeSetterTypeError);
+            });
+        }); // [setStrictMode]
+
+        describe('on()', function () {
+
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOn () {
+
+                    // Attempt to map an event that hasn't been added to the 'events' object.
+                    self.bullet.on(self.testEventName, self.testCallback);
+                }
+
+                expect(callOn).to.throw(this.bullet._errors.UndeclaredEventError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                // Get the mappings.
+                var mappings = this.bullet._getMappings();
+
+                // The map should start empty.
+                expect(mappings).to.deep.equal({});
+
+                function callOn () {
+
+                    // Map an event that was added to the 'events' object.
+                    self.bullet.on(self.testEventName, self.testCallback);
+                }
+
+                expect(callOn).to.not.throw(this.bullet._errors.UndeclaredEventError);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                var testCallbackString = this.testCallback.toString();
+
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+            });
+        }); // [on] (strict mode)
+
+        describe('off()', function () {
+
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                function callOff () {
+
+                    // Attempt to unmap an event that hasn't been added to the 'events' object.
+                    self.bullet.off(self.testEventName, self.testCallback);
+                }
+
+                expect(callOff).to.throw(this.bullet._errors.UndeclaredEventError);
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                // Map the test event to a callback via the 'on' method.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callOff () {
+
+                    // Unmap the event that was added to the 'events' object.
+                    self.bullet.off(self.testEventName, self.testCallback);
+                }
+
+                expect(callOff).to.not.throw(this.bullet._errors.UndeclaredEventError);
+            });
+        }); // [off] (strict mode)
+
+        describe('once()', function () {
+
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // The map should start empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Attempt to map an event that hasn't been added to the 'events' object.
+                    self.bullet.once(self.testEventName, self.testCallback);
+                }
+
+                expect(callOnce).to.throw(this.bullet._errors.UndeclaredEventError);
+
+                // The map should still be empty
+                expect(this.bullet._getMappings()).to.deep.equal({});
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                // Get the mappings.
+                var mappings = this.bullet._getMappings();
+
+                // The map should start empty.
+                expect(mappings).to.deep.equal({});
+
+                function callOnce () {
+
+                    // Map an event that was added to the 'events' object.
+                    self.bullet.once(self.testEventName, self.testCallback);
+                }
+
+                expect(callOnce).to.not.throw(this.bullet._errors.UndeclaredEventError);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                var testCallbackString = this.testCallback.toString();
+
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+            });
+        }); // [once] (strict mode)
+        
+        describe('trigger()', function () {
+
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                function callTrigger () {
+
+                    // Attempt to trigger an event that hasn't been added to the 'events' object.
+                    self.bullet.trigger(self.testEventName);
+                }
+
+                expect(callTrigger).to.throw(this.bullet._errors.UndeclaredEventError);
+            });
+
+            it('should throw an UnmappedEventError if the event name param is not mapped to any callbacks', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                function callTrigger () {
+
+                    // Attempt to trigger an event that hasn't been mapped any callbacks via the 'on' method.
+                    self.bullet.trigger(self.testEventName);
+                }
+
+                expect(callTrigger).to.throw(this.bullet._errors.UnmappedEventError);
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                function callTrigger () {
+
+                    // Trigger the event that was added to the 'events' object, but wasn't mapped to any callback.
+                    self.bullet.trigger(self.testEventName);
+                }
+
+                expect(callTrigger).not.to.throw(this.bullet._errors.UndeclaredEventError);
+            });
+
+            it('should not throw an UnmappedEventError if the event name param is mapped to a callback', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEvent' method.
+                this.bullet.addEvent(this.testEventName);
+
+                // Map the event that was added to the 'events' object.
+                self.bullet.on(self.testEventName, self.testCallback);
+
+                function callTrigger () {
+
+                    // Trigger the event that was added to the 'events' object and mapped to a callback.
+                    self.bullet.trigger(self.testEventName);
+                }
+
+                expect(callTrigger).to.not.throw(this.bullet._errors.UnmappedEventError);
+            });
+        }); // [trigger] (strict mode)
     });
 });
