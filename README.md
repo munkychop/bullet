@@ -50,6 +50,7 @@ Register a callback function to get called whenever the specified message is tri
 
 
     // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
+    
 
     Bullet.on('hello', helloCallback);
 
@@ -96,9 +97,12 @@ Remove either all callback functions or a specific callback function registered 
 
 
     // Remove all callback functions associated with the 'hello' message:
+
     Bullet.off('hello');
 
+
     // Attempt to trigger the 'hello' message again – Bullet won't call any functions:
+
     Bullet.trigger('hello');
 
 
@@ -126,9 +130,12 @@ Remove either all callback functions or a specific callback function registered 
     
     
     // Remove only the 'anotherCallback' function associated with the 'hello' message:
+
     Bullet.off('hello', anotherCallback);
     
+
     // Trigger the 'hello' message again – Bullet will only call the 'helloCallback' function:
+
     Bullet.trigger('hello');
 
 
@@ -365,7 +372,7 @@ Explicitly remove a message from Bullet’s 'events' object.
     Bullet.on('hello', helloCallback);
 
 
-    // Attempt to trigger the 'hello' message – Bullet will trigger the event as expected:
+    // Attempt to trigger the 'hello' message – Bullet will call the 'helloCallback' function as expected:
 
     Bullet.trigger('hello');
 
@@ -389,8 +396,8 @@ Explicitly remove a message from Bullet’s 'events' object.
 
     Bullet.events
 
-Used for getting a reference to message strings that have been explicitly defined using the `addEvent` method.
-*This property becomes most important when strict mode is enabled.*
+Used for getting a reference to message strings that have been explicitly defined within the 'events' object, usually via the `addEvent` method.
+*This property becomes most important when strict mode is enabled*
 
 **Example usage:**
 
@@ -404,11 +411,8 @@ Used for getting a reference to message strings that have been explicitly define
     Bullet.addEvent('hello');
 
 
-    /*
-        Within the 'on' method, reference the message that was explicitly added to the 'events' object.
-
-        This is helpful because an error will be thrown if the message doesn't exist:
-    */
+    // Within the 'on' method, reference the message that was explicitly added to the 'events' object.
+    // This is helpful because an error will be thrown if the message doesn't exist:
 
     Bullet.on(Bullet.events.hello, helloCallback);
 
@@ -416,27 +420,20 @@ Used for getting a reference to message strings that have been explicitly define
     // Somewhere later in the application...
 
 
-    /*
-        Trigger the message that was explicitly added to the 'events' object – Bullet will call the 'helloCallback' function.
-
-        Again, this is helpful because an error will be thrown if the message doesn't exist:
-    */
+    // Trigger the message that was explicitly added to the 'events' object – Bullet will call the 'helloCallback' function.
+    // Again, this is helpful because an error will be thrown if the message doesn't exist:
 
     Bullet.trigger(Bullet.events.hello);
 
  
-    /*
-        It is also still possible to trigger messages by using a string literal – Bullet will still call the 'helloCallback' function:
-    */
+    // It is also still possible to trigger messages by using a string literal – Bullet will still call the 'helloCallback' function:
 
-    Bullet.trigger('hello'); // 'helloCallback' function called
+    Bullet.trigger('hello');
 
 
-    /*
-        Note that – when using a string literal – an error will NOT be thrown here if the message doesn't exist, unless we enable strict mode:
-    */
+    // Note that – when using a string literal – an error will NOT be thrown here if the message doesn't exist within the 'events' object, unless we enable strict mode:
 
-    Bullet.trigger('someOtherMessage'); // no error thrown for non-explicit message
+    Bullet.trigger('someOtherMessage'); // no error thrown for unrecognised message
 
 
     // Enable strict mode.
@@ -444,9 +441,6 @@ Used for getting a reference to message strings that have been explicitly define
     Bullet.setStrictMode(true);
 
 
-    /*
-        Now that strict mode is enabled, attempt to trigger the non-explicit message again:
-    */
+    // Now that strict mode is enabled, attempt to trigger the unrecognised message again – Bullet will throw an error due to the unrecognised message:
 
-    Bullet.trigger('someOtherMessage'); // error thrown due to unrecognised message.
-    
+    Bullet.trigger('someOtherMessage'); // error thrown
