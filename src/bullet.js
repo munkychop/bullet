@@ -40,9 +40,9 @@
         CallbackTypeError.prototype.constructor = CallbackTypeError;
 
 
-        function StrictModeSetterTypeError (methodName, callback) {
+        function StrictModeSetterTypeError (setStrictModeValue) {
             
-            this.message = 'Bullet:: [setStrictMode] Expected parameter to be a boolean, but received type: ' + typeof callback;
+            this.message = 'Bullet:: [setStrictMode] Expected parameter to be a boolean, but received type: ' + typeof setStrictModeValue;
             var error = new TypeError(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
