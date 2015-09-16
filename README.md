@@ -13,7 +13,7 @@ Install via npm using the following command in your command prompt:
 
 Include Bullet within your application:
 
-    var Bullet = require("bullet-pubsub");
+    var Bullet = require('bullet-pubsub');
 
 
 #### Bower
@@ -37,7 +37,7 @@ If you are not using npm or Bower, then grab either the [minified](https://raw.g
 
 #### **.on()**
 
-    Bullet.on("someMessageName", callback);
+    Bullet.on('someMessageName', callback);
 
 
 Register a callback function to get called whenever the specified message is triggered.
@@ -45,13 +45,13 @@ Register a callback function to get called whenever the specified message is tri
 **Example usage:**
     
     function helloCallback () {
-        console.log("hello there :)");
+        console.log('hello there :)');
     }
 
 
     // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
 
-    Bullet.on("hello", helloCallback);
+    Bullet.on('hello', helloCallback);
 
 
     // Somewhere later in the application...
@@ -59,7 +59,7 @@ Register a callback function to get called whenever the specified message is tri
 
     // Trigger the 'hello' message – Bullet will call the 'helloCallback' function:
 
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
     
 
 ----------
@@ -67,7 +67,7 @@ Register a callback function to get called whenever the specified message is tri
 
 #### **.off()**
 
-    Bullet.off("someMessageName"[, callback]);
+    Bullet.off('someMessageName'[, callback]);
 
 
 Remove either all callback functions or a specific callback function registered against the specified message.
@@ -75,16 +75,16 @@ Remove either all callback functions or a specific callback function registered 
 **Example usage:**
     
     function helloCallback () {
-        console.log("hello there :)");
+        console.log('hello there :)');
     }
 
     function anotherCallback () {
-        console.log("hello again :)");
+        console.log('hello again :)');
     }
 
 
-    Bullet.on("hello", helloCallback);
-    Bullet.on("hello", anotherCallback);
+    Bullet.on('hello', helloCallback);
+    Bullet.on('hello', anotherCallback);
 
 
     // Somewhere later in the application...
@@ -92,29 +92,29 @@ Remove either all callback functions or a specific callback function registered 
 
     // Trigger the 'hello' message – Bullet will call both the 'helloCallback' and 'anotherCallback' functions:
 
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
 
 
     // Remove all callback functions associated with the 'hello' message:
-    Bullet.off("hello");
+    Bullet.off('hello');
 
     // Attempt to trigger the 'hello' message again – Bullet won't call any functions:
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
 
 
 **Example usage removing a specific callback:**
     
     function helloCallback () {
-        console.log("hello there :)");
+        console.log('hello there :)');
     }
     
     function anotherCallback () {
-        console.log("hello again :)");
+        console.log('hello again :)');
     }
     
     
-    Bullet.on("hello", helloCallback);
-    Bullet.on("hello", anotherCallback);
+    Bullet.on('hello', helloCallback);
+    Bullet.on('hello', anotherCallback);
     
     
     // Somewhere later in the application...
@@ -122,14 +122,14 @@ Remove either all callback functions or a specific callback function registered 
     
     // Trigger the 'hello' message – Bullet will call both the 'helloCallback' and 'anotherCallback' functions:
     
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
     
     
     // Remove only the 'anotherCallback' function associated with the 'hello' message:
-    Bullet.off("hello", anotherCallback);
+    Bullet.off('hello', anotherCallback);
     
     // Trigger the 'hello' message again – Bullet will only call the 'helloCallback' function:
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
 
 
 ----------
@@ -137,7 +137,7 @@ Remove either all callback functions or a specific callback function registered 
     
 #### **.once()**
 
-    Bullet.once("someMessageName", callback);
+    Bullet.once('someMessageName', callback);
 
 
 This function behaves in the same way as the the **'on'** function, except that – once registered – the callback function will only be called a single time when the specified message is triggered.
@@ -145,13 +145,13 @@ This function behaves in the same way as the the **'on'** function, except that 
 **Example usage:**
     
     function helloCallback () {
-        console.log("hello there :)");
+        console.log('hello there :)');
     }
     
     
     // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
     
-    Bullet.once("hello", helloCallback);
+    Bullet.once('hello', helloCallback);
     
 
     // Somewhere later in the application...
@@ -159,12 +159,12 @@ This function behaves in the same way as the the **'on'** function, except that 
     
     // Trigger the 'hello' message – Bullet will call the 'helloCallback' function:
     
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
     
     
     // Attempt to trigger the 'hello' message again – Bullet won't call any functions this time:
     
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
     
 
 ----------
@@ -172,7 +172,7 @@ This function behaves in the same way as the the **'on'** function, except that 
 
 #### **.trigger()**
 
-    Bullet.trigger("someMessageName"[, data]);
+    Bullet.trigger('someMessageName'[, data]);
 
 
 This function will call all callback functions registered against the specified message, optionally passing in custom data as a payload.
@@ -180,13 +180,13 @@ This function will call all callback functions registered against the specified 
 **Example usage:**
     
     function helloCallback () {
-        console.log("hello there :)");
+        console.log('hello there :)');
     }
     
     
     // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
     
-    Bullet.on("hello", helloCallback);
+    Bullet.on('hello', helloCallback);
     
 
     // Somewhere later in the application...
@@ -194,7 +194,7 @@ This function will call all callback functions registered against the specified 
     
     // Trigger the 'hello' message – Bullet will call the 'helloCallback' function:
     
-    Bullet.trigger("hello");
+    Bullet.trigger('hello');
     
 
 **Example usage with custom data:**
@@ -206,7 +206,7 @@ This function will call all callback functions registered against the specified 
     
     // Register the 'userAddedCallback' function to be called whenever the 'user-added' message is triggered:
     
-    Bullet.on("user-added", userAddedCallback);
+    Bullet.on('user-added', userAddedCallback);
     
     
     // Somewhere later in the application...
@@ -215,15 +215,173 @@ This function will call all callback functions registered against the specified 
     // Create some custom data:
     
     var customData = {
-        someProp : "bro",
-        someOtherProp : "awesome!"
+        someProp : 'bro',
+        someOtherProp : 'awesome!'
     };
     
     
     // Trigger the 'user-added' message – Bullet will call the 'helloCallback' function and
     // pass in the custom data that you created, which will be sent to the function as a parameter:
     
-    Bullet.trigger("user-added", customData);
+    Bullet.trigger('user-added', customData);
+
+
+----------
+
+
+#### **.getStrictMode()**
+
+    Bullet.getStrictMode();
+
+Returns a boolean – true if strict mode is enabled and false if not.
+
+**Example usage:**
+
+    // Check whether or not strict mode is enabled:
+
+    var strictMode = Bullet.getStrictMode(); // false (the default)
+
+
+    // Turn on strict mode:
+
+    Bullet.setStrictMode(true);
+
+
+    // Check again whether or not strict mode is enabled:
+
+    strictMode = Bullet.getStrictMode(); // true
+
+
+----------
+
+
+#### **.setStrictMode()**
+
+    Bullet.setStrictMode(boolean);
+
+Calling the `on`, `once` or `trigger` methods – when strict mode is enabled – will cause Bullet to check if the specified message was explicitly added to the `events` object and, if not, Bullet will throw an Error.
+
+**Example errors when calling .on(), .once(), and .trigger():**
+
+    function helloCallback () {
+        console.log('hello there :)');
+    }
+    
+
+    // Turn on strict mode:
+
+    Bullet.setStrictMode(true);
+
+
+    // Attempt to register the 'helloCallback' function to be called whenever the 'hello' message is triggered – Bullet will throw an error:
+    
+    Bullet.on('hello', helloCallback);
+
+
+    // Attempt to register the 'helloCallback' function to be called just once, when the 'hello' message is triggered – Bullet will throw an error:
+    
+    Bullet.once('hello', helloCallback);
+
+
+    // Attempt to trigger a 'hello' message which hasn't been explicitly added as an event – Bullet will throw an error:
+    
+    Bullet.trigger('hello');
+
+
+----------
+
+
+#### **.addEvent()**
+
+    Bullet.addEvent('someMessage');
+
+Explicitly add a message to Bullet’s 'events' object. **_Required when strictMode is enabled._**
+
+**Example usage:**
+
+    function helloCallback () {
+        console.log('hello there :)');
+    }
+
+
+    // Register the 'helloCallback' function to be called whenever a 'hello' message is triggered:
+    
+    Bullet.on('hello', helloCallback);
+
+
+    // Attempt to trigger the 'hello' message – Bullet will call the 'helloCallback' function as expected:
+
+    Bullet.trigger('hello');
+
+
+    // Turn on strict mode:
+
+    Bullet.setStrictMode(true);
+
+
+    // Attempt to trigger the 'hello' message again – Bullet will throw an error due to strict mode, as the message hasn't been explicitly added:
+
+    Bullet.trigger('hello');
+
+
+    // Explicitly add the 'hello' message:
+
+    Bullet.addEvent('hello');
+
+
+    // Attempt to trigger the 'hello' message again – Bullet will call the 'helloCallback' function as expected, now that the 'hello' message has been explicitly added:
+
+    Bullet.trigger('hello');
+
+
+----------
+
+
+#### **.removeEvent()**
+
+    Bullet.removeEvent('someMessage');
+
+Explicitly remove a message from Bullet’s 'events' object.
+
+**Example usage:**
+
+    function helloCallback () {
+        console.log('hello there :)');
+    }
+
+
+    // Turn on strict mode:
+
+    Bullet.setStrictMode(true);
+
+
+    // Explicitly add a 'hello' message:
+
+    Bullet.addEvent('hello');
+
+
+    // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
+    
+    Bullet.on('hello', helloCallback);
+
+
+    // Attempt to trigger the 'hello' message – Bullet will trigger the event as expected:
+
+    Bullet.trigger('hello');
+
+
+    // Explicitly remove the 'hello' message:
+
+    Bullet.removeEvent('hello');
+
+
+    // Attempt to trigger the 'hello' message again – Bullet will throw an error due to strict mode, as the message no longer exists as a part of Bullet’s 'events' object:
+
+    Bullet.trigger('hello');
+
+
+----------
+
 
 ### Properties
 
@@ -236,20 +394,23 @@ Used for getting a reference to message strings that have been explicitly define
 
 **Example usage:**
 
+    function helloCallback () {
+        console.log('hi');
+    }
+
+
     // Explicitly define a message string using the 'addEvent' method.
 
-    Bullet.addEvent("someMessage");
+    Bullet.addEvent('hello');
 
-    function helloCallback () {
-        console.log("hi");
-    }
 
     /*
         Within the 'on' method, reference the message that was explicitly added to the 'events' object.
+
         This is helpful because an error will be thrown if the message doesn't exist:
     */
 
-    Bullet.on(Bullet.events.someMessage, helloCallback);
+    Bullet.on(Bullet.events.hello, helloCallback);
 
 
     // Somewhere later in the application...
@@ -257,25 +418,35 @@ Used for getting a reference to message strings that have been explicitly define
 
     /*
         Trigger the message that was explicitly added to the 'events' object – Bullet will call the 'helloCallback' function.
+
         Again, this is helpful because an error will be thrown if the message doesn't exist:
     */
 
-    Bullet.trigger(Bullet.events.someMessage);
+    Bullet.trigger(Bullet.events.hello);
 
  
     /*
-        It is also still possible to trigger the message by using a string literal – Bullet will call the 'helloCallback' function.
-        Note that – when using a string literal – an error will NOT be thrown here if the message doesn't exist:
+        It is also still possible to trigger messages by using a string literal – Bullet will still call the 'helloCallback' function:
     */
 
-    Bullet.trigger("someMessage");
+    Bullet.trigger('hello'); // 'helloCallback' function called
 
 
-----------
+    /*
+        Note that – when using a string literal – an error will NOT be thrown here if the message doesn't exist, unless we enable strict mode:
+    */
+
+    Bullet.trigger('someOtherMessage'); // no error thrown for non-explicit message
 
 
-#### **strictMode**
+    // Enable strict mode.
 
-        Bullet.setStrictMode(boolean);
+    Bullet.setStrictMode(true);
 
-Calling the `on`, `once` or `trigger` methods – when strict mode is enabled – will cause Bullet to check if the specified message was explicitly added to the `events` object and, if not, Bullet will throw an Error...
+
+    /*
+        Now that strict mode is enabled, attempt to trigger the non-explicit message again:
+    */
+
+    Bullet.trigger('someOtherMessage'); // error thrown due to unrecognised message.
+    
