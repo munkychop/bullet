@@ -9,6 +9,9 @@
     "url": "http://www.ivanhayes.com"
   },
   "main": "dist/bullet.js",
+  "scripts": { 
+    "test" : "grunt test"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/munkychop/bullet.git"
