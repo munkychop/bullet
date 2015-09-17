@@ -1,0 +1,9 @@
+{
+    "extends": "../.jshintrc",
+
+    // Custom Globals
+    "globals"       : {
+
+        "expect"   : true
+    }
+}
