@@ -297,9 +297,9 @@ Calling the `on`, `once` or `trigger` methods – when strict mode is enabled �
 ----------
 
 
-#### **.addEvent()**
+#### **.addEventName()**
 
-    Bullet.addEvent('someMessage');
+    Bullet.addEventName('someMessage');
 
 Explicitly add a message to Bullet’s 'events' object. **_Explicitly defined message names are required when strict mode is enabled._**
 
@@ -332,7 +332,7 @@ Explicitly add a message to Bullet’s 'events' object. **_Explicitly defined me
 
     // Explicitly add the 'hello' message:
 
-    Bullet.addEvent('hello');
+    Bullet.addEventName('hello');
 
 
     // Attempt to trigger the 'hello' message again – Bullet will call the 'helloCallback' function as expected, now that the 'hello' message has been explicitly added:
@@ -343,9 +343,9 @@ Explicitly add a message to Bullet’s 'events' object. **_Explicitly defined me
 ----------
 
 
-#### **.removeEvent()**
+#### **.removeEventName()**
 
-    Bullet.removeEvent('someMessage');
+    Bullet.removeEventName('someMessage');
 
 Explicitly remove a message from Bullet’s 'events' object.
 
@@ -363,7 +363,7 @@ Explicitly remove a message from Bullet’s 'events' object.
 
     // Explicitly add a 'hello' message:
 
-    Bullet.addEvent('hello');
+    Bullet.addEventName('hello');
 
 
     // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
@@ -378,7 +378,7 @@ Explicitly remove a message from Bullet’s 'events' object.
 
     // Explicitly remove the 'hello' message:
 
-    Bullet.removeEvent('hello');
+    Bullet.removeEventName('hello');
 
 
     // Attempt to trigger the 'hello' message again – Bullet will throw an error due to strict mode, as the message no longer exists as a part of Bullet’s 'events' object:
@@ -395,7 +395,7 @@ Explicitly remove a message from Bullet’s 'events' object.
 
     Bullet.events
 
-Used for getting a reference to message strings that have been explicitly defined within the 'events' object, usually via the `addEvent` method.
+Used for getting a reference to message strings that have been explicitly defined within the 'events' object, usually via the `addEventName` method.
 *This property becomes most important when strict mode is enabled.*
 
 **Example usage:**
@@ -405,9 +405,9 @@ Used for getting a reference to message strings that have been explicitly define
     }
 
 
-    // Explicitly define a message string using the 'addEvent' method.
+    // Explicitly define a message string using the 'addEventName' method.
 
-    Bullet.addEvent('hello');
+    Bullet.addEventName('hello');
 
 
     // Within the 'on' method, reference the message that was explicitly added to the 'events' object.

@@ -64,7 +64,7 @@
 
         function UndeclaredEventError (methodName, eventName) {
             
-            this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" does not exist within the events dictionary\nPlease use the Bullet.addEvent method to add this string.';
+            this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" does not exist within the events dictionary\nPlease use the Bullet.addEventName method to add this string.';
 
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
@@ -326,29 +326,29 @@
             }
         };
 
-        _self.addEvent = function (eventName) {
+        _self.addEventName = function (eventName) {
 
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('addEvent', eventName);
+                throw new EventNameTypeError('addEventName', eventName);
             }
             else if (eventName.length === 0)
             {
-                throw new EventNameLengthError('addEvent');
+                throw new EventNameLengthError('addEventName');
             }
 
             _self.events[eventName] = eventName;
         };
 
-        _self.removeEvent = function (eventName) {
+        _self.removeEventName = function (eventName) {
 
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('removeEvent', eventName);
+                throw new EventNameTypeError('removeEventName', eventName);
             }
              else if (eventName.length === 0)
             {
-                throw new EventNameLengthError('removeEvent');
+                throw new EventNameLengthError('removeEventName');
             }
 
             if (_self.events[eventName]) delete _self.events[eventName];

@@ -89,12 +89,12 @@ describe('Bullet', function () {
             expect(this.bullet.once).to.be.a('function');
         });
 
-        it('should have a public method named "addEvent"', function () {
-            expect(this.bullet.addEvent).to.be.a('function');
+        it('should have a public method named "addEventName"', function () {
+            expect(this.bullet.addEventName).to.be.a('function');
         });
 
-        it('should have a public method named "removeEvent"', function () {
-            expect(this.bullet.removeEvent).to.be.a('function');
+        it('should have a public method named "removeEventName"', function () {
+            expect(this.bullet.removeEventName).to.be.a('function');
         });
 
         it('should have a public method named "getStrictMode"', function () {
@@ -599,7 +599,7 @@ describe('Bullet', function () {
             });
         }); // [once]
         
-        describe('addEvent()', function () {
+        describe('addEventName()', function () {
 
             it('should add an event to the internal "_strictEvents" object', function () {
 
@@ -609,7 +609,7 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({});
 
                 // Add an event.
-                this.bullet.addEvent('foo');
+                this.bullet.addEventName('foo');
 
                 // Get the updated events map.
                 events = this.bullet.events;
@@ -618,7 +618,7 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({foo : 'foo'});
 
                 // Add another event.
-                this.bullet.addEvent('bar');
+                this.bullet.addEventName('bar');
 
                 // Get the updated events map.
                 events = this.bullet.events;
@@ -631,35 +631,35 @@ describe('Bullet', function () {
 
                 var self = this;
 
-                function callAddEvent () {
-                    self.bullet.addEvent({hello : 'hi'});
+                function calladdEventName () {
+                    self.bullet.addEventName({hello : 'hi'});
                 }
 
-                expect(callAddEvent).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(calladdEventName).to.throw(this.bullet._errors.EventNameTypeError);
             });
 
             it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
 
                 var self = this;
 
-                function callAddEvent () {
-                    self.bullet.addEvent('');
+                function calladdEventName () {
+                    self.bullet.addEventName('');
                 }
 
-                expect(callAddEvent).to.throw(this.bullet._errors.EventNameLengthError);
+                expect(calladdEventName).to.throw(this.bullet._errors.EventNameLengthError);
             });
-        }); // [addEvent]
+        }); // [addEventName]
 
-        describe('removeEvent()', function () {
+        describe('removeEventName()', function () {
 
             it('should remove an event from the internal "_strictEvents" object', function () {
 
                 var events = this.bullet.events;
                 
                 // Add multiple events so that we can test the removal of a single event.
-                this.bullet.addEvent('foo');
-                this.bullet.addEvent('bar');
-                this.bullet.addEvent('baz');
+                this.bullet.addEventName('foo');
+                this.bullet.addEventName('bar');
+                this.bullet.addEventName('baz');
 
                 // Get the updated events map.
                 events = this.bullet.events;
@@ -667,7 +667,7 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({foo : 'foo', bar : 'bar', baz : 'baz'});
 
                 // Remove one of the events.
-                this.bullet.removeEvent('bar');
+                this.bullet.removeEventName('bar');
 
                 // Get the updated events map.
                 events = this.bullet.events;
@@ -675,8 +675,8 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({foo : 'foo', baz : 'baz'});
                 
                 // Remove the remaining events.
-                this.bullet.removeEvent('foo');
-                this.bullet.removeEvent('baz');
+                this.bullet.removeEventName('foo');
+                this.bullet.removeEventName('baz');
 
                 // Get the updated events map.
                 events = this.bullet.events;
@@ -689,24 +689,24 @@ describe('Bullet', function () {
 
                 var self = this;
 
-                function callRemoveEvent () {
-                    self.bullet.removeEvent({hello : 'hi'});
+                function callremoveEventName () {
+                    self.bullet.removeEventName({hello : 'hi'});
                 }
 
-                expect(callRemoveEvent).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callremoveEventName).to.throw(this.bullet._errors.EventNameTypeError);
             });
 
             it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
 
                 var self = this;
 
-                function callRemoveEvent () {
-                    self.bullet.removeEvent('');
+                function callremoveEventName () {
+                    self.bullet.removeEventName('');
                 }
 
-                expect(callRemoveEvent).to.throw(this.bullet._errors.EventNameLengthError);
+                expect(callremoveEventName).to.throw(this.bullet._errors.EventNameLengthError);
             });
-        }); // [removeEvent]
+        }); // [removeEventName]
     });
 
     describe('Strict Mode Method Implementation', function () {
@@ -797,8 +797,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 // Get the mappings.
                 var mappings = this.bullet._getMappings();
@@ -849,8 +849,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 // Map the test event to a callback via the 'on' method.
                 this.bullet.on(this.testEventName, this.testCallback);
@@ -896,8 +896,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 // Get the mappings.
                 var mappings = this.bullet._getMappings();
@@ -948,8 +948,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 function callTrigger () {
 
@@ -967,8 +967,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 function callTrigger () {
 
@@ -986,8 +986,8 @@ describe('Bullet', function () {
                 // Turn on strict mode.
                 this.bullet.setStrictMode(true);
 
-                // Add the test event to the 'events' object via the 'addEvent' method.
-                this.bullet.addEvent(this.testEventName);
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
 
                 // Map the event that was added to the 'events' object.
                 self.bullet.on(self.testEventName, self.testCallback);

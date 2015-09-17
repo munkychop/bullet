@@ -10,9 +10,9 @@
 
 	// Bullet.setStrictMode(true);
 
-	Bullet.addEvent('foo');
-	Bullet.addEvent('bar');
-	Bullet.addEvent('baz');
+	Bullet.addEventName('foo');
+	Bullet.addEventName('bar');
+	Bullet.addEventName('baz');
 
 	var buttonFoo = document.getElementById('button-foo');
 	var buttonBar = document.getElementById('button-bar');
