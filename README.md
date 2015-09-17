@@ -49,8 +49,7 @@ Register a callback function to get called whenever the specified message is tri
     }
 
 
-    // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
-    
+    // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:    
 
     Bullet.on('hello', helloCallback);
 
@@ -206,14 +205,14 @@ This function will call all callback functions registered against the specified 
 
 **Example usage with custom data:**
     
-    function userAddedCallback (data) {
+    function helloCallback (data) {
         console.log(data);
     }
     
     
-    // Register the 'userAddedCallback' function to be called whenever the 'user-added' message is triggered:
+    // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
     
-    Bullet.on('user-added', userAddedCallback);
+    Bullet.on('hello', helloCallback);
     
     
     // Somewhere later in the application...
@@ -227,10 +226,10 @@ This function will call all callback functions registered against the specified 
     };
     
     
-    // Trigger the 'user-added' message – Bullet will call the 'helloCallback' function and
+    // Trigger the 'hello' message – Bullet will call the 'helloCallback' function and
     // pass in the custom data that you created, which will be sent to the function as a parameter:
     
-    Bullet.trigger('user-added', customData);
+    Bullet.trigger('hello', customData);
 
 
 ----------
@@ -268,7 +267,7 @@ Returns a boolean – true if strict mode is enabled and false if not.
 
 Calling the `on`, `once` or `trigger` methods – when strict mode is enabled – will cause Bullet to check if the specified message was explicitly added to the `events` object and, if not, Bullet will throw an Error.
 
-**Example errors when calling .on(), .once(), and .trigger():**
+**Example errors when calling the `on`, `once`, or `trigger` methods:**
 
     function helloCallback () {
         console.log('hello there :)');
@@ -282,17 +281,17 @@ Calling the `on`, `once` or `trigger` methods – when strict mode is enabled �
 
     // Attempt to register the 'helloCallback' function to be called whenever the 'hello' message is triggered – Bullet will throw an error:
     
-    Bullet.on('hello', helloCallback);
+    Bullet.on('hello', helloCallback); // throws error due to unrecognised message
 
 
     // Attempt to register the 'helloCallback' function to be called just once, when the 'hello' message is triggered – Bullet will throw an error:
     
-    Bullet.once('hello', helloCallback);
+    Bullet.once('hello', helloCallback); // throws error due to unrecognised message
 
 
     // Attempt to trigger a 'hello' message which hasn't been explicitly added as an event – Bullet will throw an error:
     
-    Bullet.trigger('hello');
+    Bullet.trigger('hello'); // throws error due to unrecognised message
 
 
 ----------
@@ -302,7 +301,7 @@ Calling the `on`, `once` or `trigger` methods – when strict mode is enabled �
 
     Bullet.addEvent('someMessage');
 
-Explicitly add a message to Bullet’s 'events' object. **_Required when strictMode is enabled._**
+Explicitly add a message to Bullet’s 'events' object. **_Explicitly defined message names are required when strict mode is enabled._**
 
 **Example usage:**
 
@@ -397,7 +396,7 @@ Explicitly remove a message from Bullet’s 'events' object.
     Bullet.events
 
 Used for getting a reference to message strings that have been explicitly defined within the 'events' object, usually via the `addEvent` method.
-*This property becomes most important when strict mode is enabled*
+*This property becomes most important when strict mode is enabled.*
 
 **Example usage:**
 
@@ -412,16 +411,19 @@ Used for getting a reference to message strings that have been explicitly define
 
 
     // Within the 'on' method, reference the message that was explicitly added to the 'events' object.
-    // This is helpful because an error will be thrown if the message doesn't exist:
+    // This is helpful because an error will be thrown if the message is undefined:
 
     Bullet.on(Bullet.events.hello, helloCallback);
+
+    // Bracket notation can be used to access the property instead, if necessary:
+    // Bullet.events['hello']
 
 
     // Somewhere later in the application...
 
 
     // Trigger the message that was explicitly added to the 'events' object – Bullet will call the 'helloCallback' function.
-    // Again, this is helpful because an error will be thrown if the message doesn't exist:
+    // Again, this is helpful because an error will be thrown if the message is undefined:
 
     Bullet.trigger(Bullet.events.hello);
 
