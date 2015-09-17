@@ -72,6 +72,10 @@ Register a callback function to get called whenever the specified message is tri
 
 Remove either all callback functions or a specific callback function registered against the specified message.
 
+    Bullet.off();
+
+Remove all registered mappings by calling `off` with no parameters.
+
 **Example usage:**
     
     function helloCallback () {
@@ -136,6 +140,49 @@ Remove either all callback functions or a specific callback function registered 
     // Trigger the 'hello' message again – Bullet will only call the 'helloCallback' function:
 
     Bullet.trigger('hello');
+
+
+**Example usage removing all mappings:**
+    
+    function helloCallback () {
+        console.log('hello there :)');
+    }
+    
+    function goodbyeCallback () {
+        console.log('goodbye :)');
+    }
+    
+    
+    Bullet.on('hello', helloCallback);
+    Bullet.on('goodbye', goodbyeCallback);
+    
+    
+    // Somewhere later in the application...
+    
+    
+    // Trigger the 'hello' message – Bullet will call the 'helloCallback' function:
+    
+    Bullet.trigger('hello');
+
+
+    // Trigger the 'goodbye' message – Bullet will call the 'goodbyeCallback' function:
+    
+    Bullet.trigger('goodbye');
+    
+    
+    // Remove all mappings by calling the Bullet.off method with no parameters:
+
+    Bullet.off();
+    
+
+    // Attempt to trigger the 'hello' message again – Bullet will not call the 'helloCallback' function:
+
+    Bullet.trigger('hello');
+
+
+    // Attempt to trigger the 'goodbye' message again – Bullet will not call the 'goodbyeCallback' function:
+
+    Bullet.trigger('goodbye');
 
 
 ----------
