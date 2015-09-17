@@ -352,6 +352,34 @@ describe('Bullet', function () {
                 expect(mappings[this.someOtherEventName]).to.be.an('undefined');
             });
 
+            it('should remove all mappings when no params are passed', function () {
+
+                // Create multiple event mappings so that we can test the removal of all mappings.
+                this.bullet.on(this.testEventName, this.testCallback);
+                this.bullet.on(this.testEventName, this.someOtherCallback);
+                this.bullet.on(this.someOtherEventName, this.testCallback);
+                this.bullet.on(this.someOtherEventName, this.someOtherCallback);
+
+                var testCallbackString = this.testCallback.toString();
+                var someOtherCallbackString = this.someOtherCallback.toString();
+
+                // Get the events map.
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[testCallbackString]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+
+                // Remove all mappings.
+                this.bullet.off();
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                expect(mappings).to.deep.equal({});
+            });
+
             it('should throw an EventNameTypeError if the event name param is not a string', function () {
 
                 var self = this;

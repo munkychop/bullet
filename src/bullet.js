@@ -238,8 +238,8 @@
         {
             if (arguments.length === 0)
             {
-                // TODO : Remove all mappings??
-                // For now we'll just silently return immediately.
+                // Remove all mappings.
+                _mappings = {};
                 return;
             }
             else if (typeof eventName !== 'string')
@@ -367,16 +367,27 @@
             _strictMode = useStrictMode;
         };
 
-        // TODO : Create an 'addMultipleEvents' method with a flat object passed as a param.
-        // - include type checks for string while looping over the object (and use hasOwnProperty!).
-
-        // TODO : Create a 'replaceAllEvents' method with an object passed as a param.
-        // - include type checks for string while looping over the object (and use hasOwnProperty!).
-
-        // TODO : Create a 'removeAllEvents' method. No params necessary.
-
-        // TODO : Create an 'onMultiple' method with an array of strings passed as the first param.
+        // TODO : Create an 'addMultipleEventNames' method with an array of strings passed as a param.
         // - include type checks for string while looping over the array.
+
+        // TODO : Create a 'replaceAllEventNames' method with an array of strings passed as a param.
+        // - include type checks for string while looping over the array.
+
+        // TODO : Create a 'removeAllEventNames' method. No params necessary.
+        // – Internally this could simply call 'replaceAllEventNames' and pass an empty array as a param.
+
+        // TODO : Create an 'onAny' method with an array of strings passed as the first param and a single callback as the second.
+        // - include type checks for string while looping over the array.
+
+        // TODO : Create an 'onMultiple' method with an array of flat objects passed as a param.
+        // - example of required param structure:
+        // [{eventName: 'someEvent', callback: someCallback, once: false}, {eventName: 'anotherEvent', callback: anotherCallback, once: true}]
+
+        // TODO : Create a 'replaceCallack' method, similar to the following:
+       //  _self.replaceCallack = function (event, fn, once) {
+       //     _self.off(event);
+       //     _self.on(event, fn, once);
+       // };
     }
 
 
