@@ -19,7 +19,7 @@ Include Bullet within your application:
 #### Bower
 Install via Bower using the following command in your command prompt:
 
-
+    bower install bullet
 
 Include Bullet in your application:
 
