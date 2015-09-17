@@ -42,13 +42,6 @@ If you are not using npm or Bower, then grab either the [minified](https://raw.g
 Register a callback function to get called whenever the specified message is triggered.
 
 **Example usage:**
-
-```javascript
-function helloCallback () {
-    console.log("hello there :)");
-}
- 
-// Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
     
     function helloCallback () {
         console.log('hello there :)');
@@ -66,9 +59,7 @@ function helloCallback () {
     // Trigger the 'hello' message – Bullet will call the 'helloCallback' function:
 
     Bullet.trigger('hello');
-    
-Bullet.trigger("hello");
-```    
+
 
 ----------
 
@@ -201,7 +192,7 @@ Remove all registered mappings by calling `off` with no parameters.
     Bullet.once('someMessageName', callback);
 
 
-This function behaves in the same way as the the **'on'** function, except that – once registered – the callback function will only be called a single time when the specified message is triggered.
+This function behaves in the same way as the the `on` function, except that – once registered – the callback function will only be called a single time when the specified message is triggered.
 
 **Example usage:**
     
@@ -210,7 +201,7 @@ This function behaves in the same way as the the **'on'** function, except that 
     }
     
     
-    // Register the 'helloCallback' function to be called whenever the 'hello' message is triggered:
+    // Register the 'helloCallback' function to be called the first time that the 'hello' message is triggered:
     
     Bullet.once('hello', helloCallback);
     
