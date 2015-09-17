@@ -110,6 +110,7 @@
         // ------------------------------------------------------------------------------------------
         _self.events = {};
 
+
         // ------------------------------------------------------------------------------------------
         // -- Private methods
         // ------------------------------------------------------------------------------------------
@@ -317,12 +318,24 @@
                 return;
             }
 
-            for (var fnString in _mappings[eventName].callbacks)
-            {
-                var callbackObject = _mappings[eventName].callbacks[fnString];
+            function runCallback () {
+                for (var fnString in _mappings[eventName].callbacks)
+                {
+                    var callbackObject = _mappings[eventName].callbacks[fnString];
 
-                if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
-                if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
+                    if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
+                    if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
+                }
+            }
+
+            // Check whether or not this is a browser environment.
+            if (typeof window !== 'undefined')
+            {
+                window.setTimeout(runCallback, 0);
+            }
+            else
+            {
+                runCallback();
             }
         };
 
