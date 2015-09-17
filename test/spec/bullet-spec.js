@@ -25,12 +25,8 @@ describe('Bullet', function () {
             expect(this.bullet._errors.ParamCountError).to.be.a('function');
         });
 
-        it('should have custom error type "EventNameTypeError"', function () {
-            expect(this.bullet._errors.EventNameTypeError).to.be.a('function');
-        });
-
-        it('should have custom error type "CallbackTypeError"', function () {
-            expect(this.bullet._errors.CallbackTypeError).to.be.a('function');
+        it('should have custom error type "ParamTypeError"', function () {
+            expect(this.bullet._errors.ParamTypeError).to.be.a('function');
         });
 
         it('should have custom error type "EventNameLengthError"', function () {
@@ -43,10 +39,6 @@ describe('Bullet', function () {
 
         it('should have custom error type "UnmappedEventError"', function () {
             expect(this.bullet._errors.UnmappedEventError).to.be.a('function');
-        });
-
-        it('should have custom error type "StrictModeSetterTypeError"', function () {
-            expect(this.bullet._errors.StrictModeSetterTypeError).to.be.a('function');
         });
     });
 
@@ -79,6 +71,14 @@ describe('Bullet', function () {
 
         it('should have a public method named "off"', function () {
             expect(this.bullet.off).to.be.a('function');
+        });
+
+        it('should have a public method named "updateEventMapping"', function () {
+            expect(this.bullet.updateEventMapping).to.be.a('function');
+        });
+
+        it('should have a public method named "replaceEventMappings"', function () {
+            expect(this.bullet.replaceEventMappings).to.be.a('function');
         });
 
         it('should have a public method named "trigger"', function () {
@@ -155,7 +155,7 @@ describe('Bullet', function () {
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
             });
 
-            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+            it('should throw a ParamTypeError if the event name param is not a string', function () {
 
                 var self = this;
 
@@ -168,7 +168,7 @@ describe('Bullet', function () {
                     self.bullet.on({}, self.testCallback);
                 }
 
-                expect(callOn).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callOn).to.throw(this.bullet._errors.ParamTypeError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
@@ -193,7 +193,7 @@ describe('Bullet', function () {
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
-            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+            it('should throw a ParamTypeError if the callback parameter is not a function', function () {
 
                 var self = this;
 
@@ -206,7 +206,7 @@ describe('Bullet', function () {
                     self.bullet.on(self.testEventName, {});
                 }
 
-                expect(callOn).to.throw(this.bullet._errors.CallbackTypeError);
+                expect(callOn).to.throw(this.bullet._errors.ParamTypeError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
@@ -269,7 +269,6 @@ describe('Bullet', function () {
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
         }); // [on]
-
 
         describe('off()', function () {
 
@@ -380,7 +379,7 @@ describe('Bullet', function () {
                 expect(mappings).to.deep.equal({});
             });
 
-            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+            it('should throw an ParamTypeError if the event name param is not a string', function () {
 
                 var self = this;
 
@@ -390,7 +389,7 @@ describe('Bullet', function () {
                     self.bullet.off({}, self.testCallback);
                 }
 
-                expect(callOff).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callOff).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an EventNameLengthError if the event name param is an empty string', function () {
@@ -406,7 +405,7 @@ describe('Bullet', function () {
                 expect(callOff).to.throw(this.bullet._errors.EventNameLengthError);
             });
 
-            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+            it('should throw a ParamTypeError if the callback parameter is not a function', function () {
 
                 var self = this;
 
@@ -419,9 +418,135 @@ describe('Bullet', function () {
                     self.bullet.off(self.testEventName, {});
                 }
 
-                expect(callOff).to.throw(this.bullet._errors.CallbackTypeError);
+                expect(callOff).to.throw(this.bullet._errors.ParamTypeError);
             });
         }); // [off]
+
+        describe('updateEventMapping()', function () {
+
+            before(function () {
+
+                this.someOtherCallback = function someOtherCallback () {};
+            });
+
+            it('should throw a ParamTypeError if the event name param is not a string', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function mapped to an event name by using a non-string event name parameter.
+                    self.bullet.updateEventMapping({}, self.testCallback, self.someOtherCallback);
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function mapped to an event name by using an empty string for the event name parameter.
+                    self.bullet.updateEventMapping('', self.testCallback, self.someOtherCallback);
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.EventNameLengthError);
+            });
+            
+            it('should throw a ParamTypeError if the old callback param is not a function', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function mapped to an event name by using a non-function for the old callback parameter.
+                    self.bullet.updateEventMapping(self.testEventName, {}, self.someOtherCallback);
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw a ParamTypeError if the new callback param is not a function', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function mapped to an event name by using a non-function for the new callback parameter.
+                    self.bullet.updateEventMapping(self.testEventName, self.testCallback, {});
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw a ParamTypeError if the ‘once’ param is defined but not a boolean', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function mapped to an event name by using a non-boolean for the 'once' parameter.
+                    self.bullet.updateEventMapping(self.testEventName, self.testCallback, self.someOtherCallback, {});
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw an UnmappedEventError if the specified event name does not exist within the mappings object', function () {
+
+                var self = this;
+
+                function callUpdateEventMapping () {
+
+                    // Attempt to update a function that is not mapped to any event name.
+                    self.bullet.updateEventMapping('someRandomEventName', self.testCallback, self.someOtherCallback);
+                }
+
+                expect(callUpdateEventMapping).to.throw(this.bullet._errors.UnmappedEventError);
+            });
+
+            it('should update a single mapped function for the specified event name', function () {
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                var testCallbackString = this.testCallback.toString();
+                var someOtherCallbackString = this.someOtherCallback.toString();
+
+                // Get the events map.
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+
+                // Replace the 'this.testCallback' mapping with a mapping for 'this.someOtherCallback'
+                this.bullet.updateEventMapping(this.testEventName, this.testCallback, this.someOtherCallback);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('undefined');
+                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+            });
+
+            it('should respect the ‘once’ parameter when updating mapped functions', function () {});
+        }); // [updateEventMapping]
 
         describe('trigger()', function () {
 
@@ -458,7 +583,7 @@ describe('Bullet', function () {
                 expect(this.testCallback).to.have.been.calledWith(testData);
             });
 
-            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+            it('should throw an ParamTypeError if the event name param is not a string', function () {
 
                 var self = this;
 
@@ -468,7 +593,7 @@ describe('Bullet', function () {
                     self.bullet.trigger({});
                 }
 
-                expect(callTrigger).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callTrigger).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an EventNameLengthError if the event name param is an empty string', function () {
@@ -569,7 +694,7 @@ describe('Bullet', function () {
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
-            it('should throw an EventNameTypeError if the event name param is not a string', function () {
+            it('should throw an ParamTypeError if the event name param is not a string', function () {
 
                 var self = this;
 
@@ -582,7 +707,7 @@ describe('Bullet', function () {
                     self.bullet.once({}, self.testCallback);
                 }
 
-                expect(callOnce).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callOnce).to.throw(this.bullet._errors.ParamTypeError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
@@ -607,7 +732,7 @@ describe('Bullet', function () {
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
-            it('should throw a CallbackTypeError if the callback parameter is not a function', function () {
+            it('should throw a ParamTypeError if the callback parameter is not a function', function () {
 
                 var self = this;
 
@@ -620,7 +745,7 @@ describe('Bullet', function () {
                     self.bullet.once(self.testEventName, {});
                 }
 
-                expect(callOnce).to.throw(this.bullet._errors.CallbackTypeError);
+                expect(callOnce).to.throw(this.bullet._errors.ParamTypeError);
 
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
@@ -655,7 +780,7 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({foo : 'foo', bar : 'bar'});
             });
 
-            it('should throw an EventNameTypeError if the passed parameter is not a string', function () {
+            it('should throw an ParamTypeError if the passed parameter is not a string', function () {
 
                 var self = this;
 
@@ -663,7 +788,7 @@ describe('Bullet', function () {
                     self.bullet.addEventName({hello : 'hi'});
                 }
 
-                expect(calladdEventName).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(calladdEventName).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
@@ -713,7 +838,7 @@ describe('Bullet', function () {
                 expect(events).to.deep.equal({});
             });
         
-            it('should throw an EventNameTypeError if the passed parameter is not a string', function () {
+            it('should throw an ParamTypeError if the passed parameter is not a string', function () {
 
                 var self = this;
 
@@ -721,7 +846,7 @@ describe('Bullet', function () {
                     self.bullet.removeEventName({hello : 'hi'});
                 }
 
-                expect(callremoveEventName).to.throw(this.bullet._errors.EventNameTypeError);
+                expect(callremoveEventName).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
@@ -777,7 +902,7 @@ describe('Bullet', function () {
                 expect(this.bullet.getStrictMode()).to.equal(false);
             });
 
-            it('should throw a StrictModeSetterTypeError if a non-boolean value is passed as the parameter', function () {
+            it('should throw a ParamTypeError if a non-boolean value is passed as the parameter', function () {
 
                 var self = this;
 
@@ -790,7 +915,7 @@ describe('Bullet', function () {
                     self.bullet.setStrictMode({});
                 }
 
-                expect(callSetStrictMode).to.throw(this.bullet._errors.StrictModeSetterTypeError);
+                expect(callSetStrictMode).to.throw(this.bullet._errors.ParamTypeError);
             });
         }); // [setStrictMode]
 
@@ -892,6 +1017,12 @@ describe('Bullet', function () {
                 expect(callOff).to.not.throw(this.bullet._errors.UndeclaredEventError);
             });
         }); // [off] (strict mode)
+
+        // TODO : Add tests for replaceEventMappings method in strict mode.
+        describe('replaceEventMappings()', function () {});
+
+        // TODO : Add tests for updateEventMapping method in strict mode.
+        describe('updateEventMapping()', function () {});
 
         describe('once()', function () {
 

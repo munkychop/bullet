@@ -17,39 +17,15 @@
         ParamCountError.prototype.name = ParamCountError.name;
         ParamCountError.prototype.constructor = ParamCountError;
 
-
-        function EventNameTypeError (methodName, eventName) {
+        function ParamTypeError (methodName, parameterName, parameter, expectedType) {
             
-            this.message = 'Bullet:: [' + methodName + '] Expected event name parameter to be a string, but received type: ' + typeof eventName;
+            this.message = 'Bullet:: [' + methodName + '] Expected parameter - ' + parameterName + ' - to be type: ' + expectedType + ', but received type: ' + typeof parameter;
             var error = new TypeError(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        EventNameTypeError.prototype = new TypeError();
-        EventNameTypeError.prototype.name = EventNameTypeError.name;
-        EventNameTypeError.prototype.constructor = EventNameTypeError;
-
-
-        function CallbackTypeError (methodName, callback) {
-            
-            this.message = 'Bullet:: [' + methodName + '] Expected callback parameter to be a function, but received type: ' + typeof callback;
-            var error = new TypeError(this.message);
-            if (typeof error.stack !== 'undefined') this.stack = error.stack;
-        }
-        CallbackTypeError.prototype = new TypeError();
-        CallbackTypeError.prototype.name = CallbackTypeError.name;
-        CallbackTypeError.prototype.constructor = CallbackTypeError;
-
-
-        function StrictModeSetterTypeError (setStrictModeValue) {
-            
-            this.message = 'Bullet:: [setStrictMode] Expected parameter to be a boolean, but received type: ' + typeof setStrictModeValue;
-            var error = new TypeError(this.message);
-            if (typeof error.stack !== 'undefined') this.stack = error.stack;
-        }
-        StrictModeSetterTypeError.prototype = new TypeError();
-        StrictModeSetterTypeError.prototype.name = StrictModeSetterTypeError.name;
-        StrictModeSetterTypeError.prototype.constructor = StrictModeSetterTypeError;
-
+        ParamTypeError.prototype = new TypeError();
+        ParamTypeError.prototype.name = ParamTypeError.name;
+        ParamTypeError.prototype.constructor = ParamTypeError;
 
         function EventNameLengthError (methodName) {
             
@@ -96,12 +72,10 @@
         // Expose custom error type constructors (for testing), but use an underscore to imply privacy.
         _self._errors = {
             ParamCountError : ParamCountError,
-            EventNameTypeError : EventNameTypeError,
-            CallbackTypeError : CallbackTypeError,
+            ParamTypeError : ParamTypeError,
             EventNameLengthError : EventNameLengthError,
             UndeclaredEventError : UndeclaredEventError,
             UnmappedEventError : UnmappedEventError,
-            StrictModeSetterTypeError : StrictModeSetterTypeError
         };
 
 
@@ -159,7 +133,7 @@
 
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('on', eventName);
+                throw new ParamTypeError('on', 'event name', eventName, 'string');
             }
             else if (eventName.length === 0)
             {
@@ -172,7 +146,12 @@
 
             if (typeof fn !== 'function')
             {
-                throw new CallbackTypeError('on', fn);
+                throw new ParamTypeError('on', 'callback', fn, 'function');
+            }
+
+            if (typeof once !== 'undefined' && typeof once !== 'boolean')
+            {
+                throw new ParamTypeError('on', 'once', once, 'boolean');
             }
 
             var fnString = fn.toString();
@@ -185,7 +164,7 @@
                 {
                     _mappings[eventName].callbacks[fnString] = {
                         cb : fn,
-                        once : !!once
+                        once : typeof once === 'boolean' ? once : false
                     };
 
                     _mappings[eventName].totalCallbacks++;
@@ -216,7 +195,7 @@
             }
             else if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('on', eventName);
+                throw new ParamTypeError('once', 'event name', eventName, 'string');
             }
             else if (eventName.length === 0)
             {
@@ -229,7 +208,7 @@
 
             if (typeof fn !== 'function')
             {
-                throw new CallbackTypeError('once', fn);
+                throw new ParamTypeError('once', 'callback', fn, 'function');
             }
 
             _self.on(eventName, fn, true);
@@ -245,7 +224,7 @@
             }
             else if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('off', eventName);
+                throw new ParamTypeError('off', 'event name', eventName, 'string');
             }
             else if (eventName.length === 0)
             {
@@ -285,7 +264,7 @@
             }
             else if (typeof fn !== 'undefined')
             {
-                throw new CallbackTypeError('off', fn);
+                throw new ParamTypeError('off', 'callback', fn, 'function');
             }
             else
             {
@@ -295,11 +274,86 @@
             }
         };
 
+        // Update a single mapped function for the specified event name.
+        _self.updateEventMapping = function (eventName, oldFn, newFn, once) {
+
+            console.log('eventName:', eventName, '_mappings[eventName]:', _mappings[eventName]);
+            if (typeof eventName !== 'string')
+            {
+                throw new ParamTypeError('replace', 'event name', eventName, 'string');
+            }
+            else if (eventName.length === 0)
+            {
+                throw new EventNameLengthError('replace');
+            }
+            else if (typeof _mappings[eventName] === 'undefined')
+            {
+                console.log('#### #### unmapped event!');
+                throw new UnmappedEventError('replace', eventName);
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('replace', eventName);
+            }
+
+            if (typeof oldFn !== 'function')
+            {
+                throw new ParamTypeError('replace', 'callback', oldFn, 'function');
+            }
+
+            if (typeof newFn !== 'function')
+            {
+                throw new ParamTypeError('replace', 'callback', newFn, 'function');
+            }
+
+            if (typeof once !== 'undefined' && typeof once !== 'boolean')
+            {
+                throw new ParamTypeError('replace', 'once', once, 'boolean');
+            }
+            
+            _self.off(eventName, oldFn);
+            _self.on(eventName, newFn, once);
+        };
+
+        // Replace all of the specified event name’s mapped callbacks with the specified callback.
+        _self.replaceEventMappings = function (eventName, fn, once) {
+
+            if (typeof eventName !== 'string')
+            {
+                throw new ParamTypeError('replace', 'event name', eventName, 'string');
+            }
+            else if (eventName.length === 0)
+            {
+                throw new EventNameLengthError('replace');
+            }
+            else if (typeof _mappings[eventName] === 'undefined')
+            {
+                throw new UnmappedEventError('replace', eventName);
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('replace', eventName);
+            }
+
+            if (typeof fn !== 'function')
+            {
+                throw new ParamTypeError('replace', 'callback', fn, 'function');
+            }
+
+            if (typeof once !== 'undefined' && typeof once !== 'boolean')
+            {
+                throw new ParamTypeError('replace', 'once', once, 'boolean');
+            }
+            
+            _self.off(eventName);
+            _self.on(eventName, fn, once);
+        };
+
         _self.trigger = function (eventName, data)
         {
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('trigger', eventName);
+                throw new ParamTypeError('trigger', 'event name', eventName, 'string');
             }
             else if (eventName.length === 0)
             {
@@ -343,7 +397,7 @@
 
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('addEventName', eventName);
+                throw new ParamTypeError('addEventName', 'event name', eventName, 'string');
             }
             else if (eventName.length === 0)
             {
@@ -357,7 +411,7 @@
 
             if (typeof eventName !== 'string')
             {
-                throw new EventNameTypeError('removeEventName', eventName);
+                throw new ParamTypeError('removeEventName', 'event name', eventName, 'string');
             }
              else if (eventName.length === 0)
             {
@@ -375,7 +429,7 @@
 
         _self.setStrictMode = function (useStrictMode) {
 
-            if (typeof useStrictMode !== 'boolean') throw new StrictModeSetterTypeError(useStrictMode);
+            if (typeof useStrictMode !== 'boolean') throw new ParamTypeError('setStrictMode', 'strict mode', useStrictMode, 'boolean');
 
             _strictMode = useStrictMode;
         };
