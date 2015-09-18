@@ -274,7 +274,7 @@
             }
         };
 
-        // replace a single mapped callback for the specified event name with a new callback.
+        // Replace a single mapped callback for the specified event name with a new callback.
         _self.replaceCallback = function (eventName, oldFn, newFn, once) {
 
             if (typeof eventName !== 'string')
