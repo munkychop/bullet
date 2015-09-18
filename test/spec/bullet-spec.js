@@ -73,12 +73,12 @@ describe('Bullet', function () {
             expect(this.bullet.off).to.be.a('function');
         });
 
-        it('should have a public method named "updateEventMapping"', function () {
-            expect(this.bullet.updateEventMapping).to.be.a('function');
+        it('should have a public method named "replaceCallback"', function () {
+            expect(this.bullet.replaceCallback).to.be.a('function');
         });
 
-        it('should have a public method named "replaceEventMappings"', function () {
-            expect(this.bullet.replaceEventMappings).to.be.a('function');
+        it('should have a public method named "replaceAllCallbacks"', function () {
+            expect(this.bullet.replaceAllCallbacks).to.be.a('function');
         });
 
         it('should have a public method named "trigger"', function () {
@@ -422,7 +422,7 @@ describe('Bullet', function () {
             });
         }); // [off]
 
-        describe('updateEventMapping()', function () {
+        describe('replaceCallback()', function () {
 
             before(function () {
 
@@ -436,13 +436,13 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function mapped to an event name by using a non-string event name parameter.
-                    self.bullet.updateEventMapping({}, self.testCallback, self.someOtherCallback);
+                    self.bullet.replaceCallback({}, self.testCallback, self.someOtherCallback);
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an EventNameLengthError if the event name param is an empty string', function () {
@@ -452,13 +452,13 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function mapped to an event name by using an empty string for the event name parameter.
-                    self.bullet.updateEventMapping('', self.testCallback, self.someOtherCallback);
+                    self.bullet.replaceCallback('', self.testCallback, self.someOtherCallback);
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.EventNameLengthError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.EventNameLengthError);
             });
             
             it('should throw a ParamTypeError if the old callback param is not a function', function () {
@@ -468,13 +468,13 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function mapped to an event name by using a non-function for the old callback parameter.
-                    self.bullet.updateEventMapping(self.testEventName, {}, self.someOtherCallback);
+                    self.bullet.replaceCallback(self.testEventName, {}, self.someOtherCallback);
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw a ParamTypeError if the new callback param is not a function', function () {
@@ -484,13 +484,13 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function mapped to an event name by using a non-function for the new callback parameter.
-                    self.bullet.updateEventMapping(self.testEventName, self.testCallback, {});
+                    self.bullet.replaceCallback(self.testEventName, self.testCallback, {});
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw a ParamTypeError if the ‘once’ param is defined but not a boolean', function () {
@@ -500,26 +500,26 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function mapped to an event name by using a non-boolean for the 'once' parameter.
-                    self.bullet.updateEventMapping(self.testEventName, self.testCallback, self.someOtherCallback, {});
+                    self.bullet.replaceCallback(self.testEventName, self.testCallback, self.someOtherCallback, {});
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.ParamTypeError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.ParamTypeError);
             });
 
             it('should throw an UnmappedEventError if the specified event name does not exist within the mappings object', function () {
 
                 var self = this;
 
-                function callUpdateEventMapping () {
+                function callReplaceCallback () {
 
                     // Attempt to update a function that is not mapped to any event name.
-                    self.bullet.updateEventMapping('someRandomEventName', self.testCallback, self.someOtherCallback);
+                    self.bullet.replaceCallback('someRandomEventName', self.testCallback, self.someOtherCallback);
                 }
 
-                expect(callUpdateEventMapping).to.throw(this.bullet._errors.UnmappedEventError);
+                expect(callReplaceCallback).to.throw(this.bullet._errors.UnmappedEventError);
             });
 
             it('should update a single mapped function for the specified event name', function () {
@@ -536,7 +536,7 @@ describe('Bullet', function () {
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
 
                 // Replace the 'this.testCallback' mapping with a mapping for 'this.someOtherCallback'
-                this.bullet.updateEventMapping(this.testEventName, this.testCallback, this.someOtherCallback);
+                this.bullet.replaceCallback(this.testEventName, this.testCallback, this.someOtherCallback);
 
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
@@ -545,8 +545,129 @@ describe('Bullet', function () {
                 expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
             });
 
-            it('should respect the ‘once’ parameter when updating mapped functions', function () {});
-        }); // [updateEventMapping]
+            it('should respect the ‘once’ parameter when replacing mapped functions', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                // update the function mapped to the testEventName and set the 'once' param for the new function.
+                self.bullet.replaceCallback(self.testEventName, self.testCallback, self.someOtherCallback, true);
+
+                // Get the updated events map.
+                var mappings = this.bullet._getMappings();
+
+                var someOtherCallbackString = this.someOtherCallback.toString();
+
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[someOtherCallbackString].once).to.equal(true);
+            });
+        }); // [replace]
+
+        describe('replaceAllCallbacks()', function () {
+
+            before(function () {
+
+                this.someOtherCallback = function someOtherCallback () {};
+            });
+
+            it('should throw a ParamTypeError if the event name param is not a string', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace all functions mapped to an event name by using a non-string event name parameter.
+                    self.bullet.replaceAllCallbacks({}, self.someOtherCallback);
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw an EventNameLengthError if the event name param is an empty string', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace all functions mapped to an event name by using an empty string for the event name parameter.
+                    self.bullet.replaceAllCallbacks('', self.someOtherCallback);
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.EventNameLengthError);
+            });
+
+            it('should throw a ParamTypeError if the new callback param is not a function', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace all functions mapped to an event name by using a non-function for the new callback parameter.
+                    self.bullet.replaceAllCallbacks(self.testEventName, {});
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw a ParamTypeError if the ‘once’ param is defined but not a boolean', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace all functions mapped to an event name by using a non-boolean for the 'once' parameter.
+                    self.bullet.replaceAllCallbacks(self.testEventName, self.someOtherCallback, {});
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.ParamTypeError);
+            });
+
+            it('should throw an UnmappedEventError if the specified event name does not exist within the mappings object', function () {
+
+                var self = this;
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace a function that is not mapped to any event name.
+                    self.bullet.replaceAllCallbacks('someRandomEventName', self.someOtherCallback);
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.UnmappedEventError);
+            });
+
+            it('should respect the ‘once’ parameter when replacing all mapped functions', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                // update the function mapped to the testEventName and set the 'once' param for the new function.
+                self.bullet.replaceAllCallbacks(self.testEventName, self.someOtherCallback, true);
+
+                // Get the updated events map.
+                var mappings = this.bullet._getMappings();
+                
+                var someOtherCallbackString = this.someOtherCallback.toString();
+
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[someOtherCallbackString].once).to.equal(true);
+            });
+        }); // [replaceAllCallbacks]
 
         describe('trigger()', function () {
 
@@ -1018,11 +1139,93 @@ describe('Bullet', function () {
             });
         }); // [off] (strict mode)
 
-        // TODO : Add tests for replaceEventMappings method in strict mode.
-        describe('replaceEventMappings()', function () {});
+        describe('replaceCallback()', function () {
 
-        // TODO : Add tests for updateEventMapping method in strict mode.
-        describe('updateEventMapping()', function () {});
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                // Turn on strict mode after the event was already mapped (to avoid errors from the 'on' method).
+                this.bullet.setStrictMode(true);
+
+                function callReplace () {
+
+                    // Attempt to replace a function for an event that hasn't been added to the 'events' object.
+                    self.bullet.replaceCallback(self.testEventName, self.testCallback, self.someOtherCallback);
+                }
+
+                expect(callReplace).to.throw(this.bullet._errors.UndeclaredEventError);
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplace () {
+
+                    // Replace a function for an event that was added to the 'events' object.
+                    self.bullet.replaceCallback(self.testEventName, self.testCallback, self.someOtherCallback);
+                }
+
+                expect(callReplace).to.not.throw(this.bullet._errors.UndeclaredEventError);
+            });
+        }); // [replaceCallback] (strict mode)
+
+        describe('replaceAllCallbacks()', function () {
+
+            it('should throw an UndeclaredEventError if the event name param is not in the "events" object', function () {
+
+                var self = this;
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                // Turn on strict mode after the event was already mapped (to avoid errors from the 'on' method).
+                this.bullet.setStrictMode(true);
+
+                function callReplaceAllCallbacks () {
+
+                    // Attempt to replace all functions for an event that hasn't been added to the 'events' object.
+                    self.bullet.replaceAllCallbacks(self.testEventName, self.someOtherCallback);
+                }
+
+                expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.UndeclaredEventError);
+            });
+
+            it('should not throw an UndeclaredEventError if the event name param is in the "events" object', function () {
+
+                var self = this;
+
+                // Turn on strict mode.
+                this.bullet.setStrictMode(true);
+
+                // Add the test event to the 'events' object via the 'addEventName' method.
+                this.bullet.addEventName(this.testEventName);
+
+                // Create an event mapping.
+                this.bullet.on(this.testEventName, this.testCallback);
+
+                function callReplaceAllCallbacks () {
+
+                    // Replace all functions for an event that was added to the 'events' object.
+                    self.bullet.replaceAllCallbacks(self.testEventName, self.someOtherCallback);
+                }
+
+                expect(callReplaceAllCallbacks).to.not.throw(this.bullet._errors.UndeclaredEventError);
+            });
+        }); // [replaceAllCallbacks] (strict mode)
 
         describe('once()', function () {
 

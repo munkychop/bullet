@@ -274,10 +274,48 @@
             }
         };
 
-        // Update a single mapped function for the specified event name.
-        _self.updateEventMapping = function (eventName, oldFn, newFn, once) {
+        // replace a single mapped callback for the specified event name with a new callback.
+        _self.replaceCallback = function (eventName, oldFn, newFn, once) {
 
-            console.log('eventName:', eventName, '_mappings[eventName]:', _mappings[eventName]);
+            if (typeof eventName !== 'string')
+            {
+                throw new ParamTypeError('replaceCallback', 'event name', eventName, 'string');
+            }
+            else if (eventName.length === 0)
+            {
+                throw new EventNameLengthError('replaceCallback');
+            }
+            else if (typeof _mappings[eventName] === 'undefined')
+            {
+                throw new UnmappedEventError('replaceCallback', eventName);
+            }
+            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
+            {
+                throw new UndeclaredEventError('replaceCallback', eventName);
+            }
+
+            if (typeof oldFn !== 'function')
+            {
+                throw new ParamTypeError('replaceCallback', 'callback', oldFn, 'function');
+            }
+
+            if (typeof newFn !== 'function')
+            {
+                throw new ParamTypeError('replaceCallback', 'callback', newFn, 'function');
+            }
+
+            if (typeof once !== 'undefined' && typeof once !== 'boolean')
+            {
+                throw new ParamTypeError('replaceCallback', 'once', once, 'boolean');
+            }
+            
+            _self.off(eventName, oldFn);
+            _self.on(eventName, newFn, once);
+        };
+
+        // Replace all of the specified event name’s mapped callbacks with the specified callback.
+        _self.replaceAllCallbacks = function (eventName, newFn, once) {
+
             if (typeof eventName !== 'string')
             {
                 throw new ParamTypeError('replace', 'event name', eventName, 'string');
@@ -288,17 +326,11 @@
             }
             else if (typeof _mappings[eventName] === 'undefined')
             {
-                console.log('#### #### unmapped event!');
                 throw new UnmappedEventError('replace', eventName);
             }
             else if (_strictMode && typeof _self.events[eventName] === 'undefined')
             {
                 throw new UndeclaredEventError('replace', eventName);
-            }
-
-            if (typeof oldFn !== 'function')
-            {
-                throw new ParamTypeError('replace', 'callback', oldFn, 'function');
             }
 
             if (typeof newFn !== 'function')
@@ -311,42 +343,8 @@
                 throw new ParamTypeError('replace', 'once', once, 'boolean');
             }
             
-            _self.off(eventName, oldFn);
-            _self.on(eventName, newFn, once);
-        };
-
-        // Replace all of the specified event name’s mapped callbacks with the specified callback.
-        _self.replaceEventMappings = function (eventName, fn, once) {
-
-            if (typeof eventName !== 'string')
-            {
-                throw new ParamTypeError('replace', 'event name', eventName, 'string');
-            }
-            else if (eventName.length === 0)
-            {
-                throw new EventNameLengthError('replace');
-            }
-            else if (typeof _mappings[eventName] === 'undefined')
-            {
-                throw new UnmappedEventError('replace', eventName);
-            }
-            else if (_strictMode && typeof _self.events[eventName] === 'undefined')
-            {
-                throw new UndeclaredEventError('replace', eventName);
-            }
-
-            if (typeof fn !== 'function')
-            {
-                throw new ParamTypeError('replace', 'callback', fn, 'function');
-            }
-
-            if (typeof once !== 'undefined' && typeof once !== 'boolean')
-            {
-                throw new ParamTypeError('replace', 'once', once, 'boolean');
-            }
-            
             _self.off(eventName);
-            _self.on(eventName, fn, once);
+            _self.on(eventName, newFn, once);
         };
 
         _self.trigger = function (eventName, data)
@@ -449,12 +447,6 @@
         // TODO : Create an 'onMultiple' method with an array of flat objects passed as a param.
         // - example of required param structure:
         // [{eventName: 'someEvent', callback: someCallback, once: false}, {eventName: 'anotherEvent', callback: anotherCallback, once: true}]
-
-        // TODO : Create a 'replaceCallack' method, similar to the following:
-       //  _self.replaceCallack = function (event, fn, once) {
-       //     _self.off(event);
-       //     _self.on(event, fn, once);
-       // };
     }
 
 
