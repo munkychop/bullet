@@ -635,6 +635,72 @@ Bullet.trigger('hello');
 ----------
 
 
+#### **.getTriggerAsync()**
+
+```javascript
+Bullet.getTriggerAsync();
+```
+
+Returns a boolean – true if async message triggers are enabled and false if not.
+
+
+**Example usage:**
+
+```javascript
+
+// Check whether or not async message triggers are enabled:
+
+var triggerAsync = Bullet.getTriggerAsync(); // true (the default)
+
+
+// Turn off async message triggers:
+
+Bullet.setTriggerAsync(false);
+
+
+// Check again whether or not async message triggers are enabled:
+
+triggerAsync = Bullet.getTriggerAsync(); // false
+
+```
+
+
+----------
+
+
+#### **.setTriggerAsync()**
+
+```javascript
+Bullet.setTriggerAsync();
+```
+
+When called and passed a value of `true`, Bullet will trigger messages asynchronously (outside of the current execution call stack) and when called and passed a value of `false`, Bullet will trigger messages synchronously.
+
+
+**Example usage:**
+
+```javascript
+
+// Check whether or not async message triggers are enabled:
+
+var triggerAsync = Bullet.getTriggerAsync(); // true (the default)
+
+
+// Turn off async message triggers:
+
+Bullet.setTriggerAsync(false);
+
+
+// Check again whether or not async message triggers are enabled:
+
+triggerAsync = Bullet.getTriggerAsync(); // false
+
+```
+
+
+----------
+
+
 ### Properties
 
 #### **.events**
