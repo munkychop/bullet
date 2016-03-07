@@ -2,7 +2,7 @@
   "name": "bullet-pubsub",
   "title": "Bullet",
   "description": "A lightweight and simple to use pub-sub library.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "homepage": "https://github.com/munkychop/bullet",
   "author": {
     "name": "Ivan Hayes",
