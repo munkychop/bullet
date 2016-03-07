@@ -68,6 +68,7 @@
         var _self = this;
         var _mappings = {};
         var _strictMode = false;
+        var _triggerAsync = true;
 
         // Expose custom error type constructors (for testing), but use an underscore to imply privacy.
         _self._errors = {
@@ -381,7 +382,7 @@
             }
 
             // Check whether or not this is a browser environment.
-            if (typeof window !== 'undefined')
+            if (_triggerAsync && typeof window !== 'undefined')
             {
                 window.setTimeout(runCallback, 0);
             }
@@ -431,6 +432,19 @@
 
             _strictMode = useStrictMode;
         };
+
+        _self.getTriggerAsync = function () {
+
+            // Return a boolean that doesn't directly point to the internal '_triggerAsync' property.
+            return _triggerAsync === true ? true : false;
+        };
+
+        _self.setTriggerAsync = function (useAsync) {
+
+            if (typeof useAsync !== 'boolean') throw new ParamTypeError('setTriggerAsync', 'trigger async', useAsync, 'boolean');
+
+            _triggerAsync = useAsync;
+        }
 
         // TODO : Create an 'addMultipleEventNames' method with an array of strings passed as a param.
         // - include type checks for string while looping over the array.
