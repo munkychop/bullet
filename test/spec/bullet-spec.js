@@ -104,6 +104,14 @@ describe('Bullet', function () {
         it('should have a public method named "setStrictMode"', function () {
             expect(this.bullet.setStrictMode).to.be.a('function');
         });
+
+        it('should have a public method named "getTriggerAsync"', function () {
+            expect(this.bullet.getTriggerAsync).to.be.a('function');
+        });
+
+        it('should have a public method named "setTriggerAsync"', function () {
+            expect(this.bullet.setTriggerAsync).to.be.a('function');
+        });
     });
 
     describe('Method Implementation', function () {
@@ -1039,6 +1047,54 @@ describe('Bullet', function () {
                 expect(callSetStrictMode).to.throw(this.bullet._errors.ParamTypeError);
             });
         }); // [setStrictMode]
+
+        describe('getTriggerAsync()', function () {
+
+            it('should return the boolean value of the private "_triggerAsync" property', function () {
+
+                expect(this.bullet.getTriggerAsync()).to.be.a('boolean');
+            });
+
+            it('should be true by default', function () {
+
+                expect(this.bullet.getTriggerAsync()).to.equal(true);
+            });
+        }); // [getTriggerAsync]
+
+        describe('setTriggerAsync()', function () {
+
+            it('should set the private "_triggerAsync" property to a boolean value', function () {
+
+                // It should be true by default.
+                expect(this.bullet.getTriggerAsync()).to.equal(true);
+
+                // Turn off async triggers.
+                this.bullet.setTriggerAsync(false);
+
+                expect(this.bullet.getTriggerAsync()).to.equal(false);
+
+                // Turn on async triggers.
+                this.bullet.setTriggerAsync(true);
+
+                expect(this.bullet.getTriggerAsync()).to.equal(true);
+            });
+
+            it('should throw a ParamTypeError if a non-boolean value is passed as the parameter', function () {
+
+                var self = this;
+
+                // It should be true by default.
+                expect(this.bullet.getTriggerAsync()).to.equal(true);
+
+                function callSetTriggerAsync () {
+
+                    // Call setTriggerAsync and pass in a non-boolean value.
+                    self.bullet.setTriggerAsync({});
+                }
+
+                expect(callSetTriggerAsync).to.throw(this.bullet._errors.ParamTypeError);
+            });
+        }); // [setTriggerAsync]
 
         describe('on()', function () {
 
