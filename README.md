@@ -671,7 +671,7 @@ triggerAsync = Bullet.getTriggerAsync(); // false
 #### **.setTriggerAsync()**
 
 ```javascript
-Bullet.setTriggerAsync();
+Bullet.setTriggerAsync(boolean);
 ```
 
 When called and passed a value of `true`, Bullet will trigger messages asynchronously (outside of the current execution call stack) and when called and passed a value of `false`, Bullet will trigger messages synchronously.
