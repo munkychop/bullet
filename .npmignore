@@ -3,6 +3,5 @@
 bower.json
 Gruntfile.js
 src
-dist/bullet.min.js
 test
 example
