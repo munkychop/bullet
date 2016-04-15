@@ -300,7 +300,7 @@
         };
 
         // Replace a single mapped callback for the specified event name with a new callback.
-        _self.replaceCallback = function (eventName, oldFn, newFn, once, id) {
+        _self.replaceCallback = function (eventName, oldFn, newFn, once, oldFnId, newFnId) {
 
             if (typeof eventName !== 'string')
             {
@@ -334,13 +334,18 @@
                 throw new ParamTypeError('replaceCallback', 'once', once, 'boolean');
             }
             
-            if (typeof id !== 'undefined' && typeof id !== 'string')
+            if (typeof oldFnId !== 'undefined' && typeof oldFnId !== 'string')
             {
-                throw new ParamTypeError('replaceCallback', 'id', id, 'string');
+                throw new ParamTypeError('replaceCallback', 'id', oldFnId, 'string');
             }
             
-            _self.off(eventName, oldFn, id);
-            _self.on(eventName, newFn, once, id);
+            if (typeof newFnId !== 'undefined' && typeof newFnId !== 'string')
+            {
+                throw new ParamTypeError('replaceCallback', 'id', newFnId, 'string');
+            }
+            
+            _self.off(eventName, oldFn, oldFnId);
+            _self.on(eventName, newFn, once, newFnId);
         };
 
         // Replace all of the specified event name’s mapped callbacks with the specified callback.

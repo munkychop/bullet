@@ -46,11 +46,12 @@ If you are not using npm or Bower, then grab either the [minified](https://raw.g
 #### **.on()**
 
 ```javascript
-Bullet.on('someMessageName', callback);
+Bullet.on('someMessageName', callback[, once, id]);
 ```
 
 Register a callback function to get called whenever the specified message is triggered.
-
+If the optional once flag is set to true then the function is the same as calling `Bullet.once(...)`.
+The optional id parameter can be used when the same callback function is used by multiple modules
 
 **Example usage:**
 
@@ -73,6 +74,16 @@ Bullet.on('hello', helloCallback);
 
 Bullet.trigger('hello');
 
+// Register the 'helloCallback' function again, but with an id
+
+Bullet.on("hello", helloCallback, false, "myId");
+
+// ...
+
+// Triggering the 'hello' message will now call helloCallback twice, for without the id and with the id (which separates it from the first)
+
+Bullet.trigger('hello'); 
+
 ```
 
 
@@ -82,10 +93,10 @@ Bullet.trigger('hello');
 #### **.off()**
 
 ```javascript
-Bullet.off('someMessageName'[, callback]);
+Bullet.off('someMessageName'[, callback, id]);
 ```
 
-Remove either all callback functions or a specific callback function registered against the specified message.
+Remove either all callback functions or a specific callback function (with optional id) registered against the specified message.
 
 ```javascript
 Bullet.off();
@@ -146,22 +157,32 @@ function anotherCallback () {
 
 Bullet.on('hello', helloCallback);
 Bullet.on('hello', anotherCallback);
+Bullet.on('hello', anotherCallback, false, "myId");
 
 
 // Somewhere later in the application...
 
 
-// Trigger the 'hello' message – Bullet will call both the 'helloCallback' and 'anotherCallback' functions:
+// Trigger the 'hello' message – Bullet will call both the 'helloCallback' and 'anotherCallback' (calling it twice because of the id) functions:
 
 Bullet.trigger('hello');
 
 
-// Remove only the 'anotherCallback' function associated with the 'hello' message:
+// Remove only the 'anotherCallback' function associated with the 'hello' message, which doesn't use an id:
 
 Bullet.off('hello', anotherCallback);
 
 
-// Trigger the 'hello' message again – Bullet will only call the 'helloCallback' function:
+// Trigger the 'hello' message again – Bullet will call both the 'helloCallback' and 'anotherCallback' (this time only once because of the id case) function:
+
+Bullet.trigger('hello');
+
+// Remove only the 'anotherCallback' function associated with the 'hello' message, which is associated with the 'myId' id:
+
+Bullet.off('hello', anotherCallback, "myId");
+
+
+// Trigger the 'hello' message again – Bullet will call only the 'helloCallback' function:
 
 Bullet.trigger('hello');
 
@@ -221,7 +242,7 @@ Bullet.trigger('goodbye');
 #### **.once()**
 
 ```javascript
-Bullet.once('someMessageName', callback);
+Bullet.once('someMessageName', callback[, id]);
 ```
 
 This function behaves in the same way as the the `on` function, except that – once registered – the callback function will only be called a single time when the specified message is triggered.
@@ -331,10 +352,11 @@ Bullet.trigger('hello', customData);
 #### **.replaceCallback()**
 
 ```javascript
-Bullet.replaceCallback('someMessageName', oldCallback, newCallback[, once]);
+Bullet.replaceCallback('someMessageName', oldCallback, newCallback[, once, oldCallbackId, newCallbackId]);
 ```
 
 Replace a single mapped callback for the specified event name with a new callback, optionally setting the 'once' parameter.
+You can also optionally use the function id's that are used when adding event listeners, both for finding the old callback function with the id and with setting the new callback function id. 
 
 
 **Example usage:**
@@ -374,10 +396,10 @@ Bullet.replaceCallback(Bullet.events.hello, helloCallback, someOtherCallback, tr
 #### **.replaceAllCallbacks()**
 
 ```javascript
-Bullet.replaceAllCallbacks('someMessageName', newCallback[, once]);
+Bullet.replaceAllCallbacks('someMessageName', newCallback[, once, id]);
 ```
 
-Replace all of the specified event name’s mapped callbacks with the specified callback, optionally setting the 'once' parameter.
+Replace all of the specified event name’s mapped callbacks with the specified callback, optionally setting the 'once' parameter and the 'id' parameter for the new callback funciton id.
 
 
 **Example usage:**
