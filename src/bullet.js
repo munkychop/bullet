@@ -120,16 +120,25 @@
 
             return clonedMappings;
         };
+        
+        
+        // Simple constructor for the function id
+        _self._getFunctionId = function (fn, id) {
+            if (id === undefined) {
+                return fn.toString();
+            }
+            return id + "-" + fn.toString(); 
+        };
 
 
         // ------------------------------------------------------------------------------------------
         // -- Public methods
         // ------------------------------------------------------------------------------------------
-        _self.on = function (eventName, fn, once)
+        _self.on = function (eventName, fn, once, id)
         {
-            if (arguments.length < 2 || arguments.length > 3)
+            if (arguments.length < 2 || arguments.length > 4)
             {
-                throw new ParamCountError('on', 'Expected between 2 and 3 parameters', arguments.length);
+                throw new ParamCountError('on', 'Expected between 2 and 4 parameters', arguments.length);
             }
 
             if (typeof eventName !== 'string')
@@ -154,8 +163,13 @@
             {
                 throw new ParamTypeError('on', 'once', once, 'boolean');
             }
+            
+            if (typeof id !== 'undefined' && typeof id !== 'string')
+            {
+                throw new ParamTypeError('on', 'id', id, 'string');
+            }
 
-            var fnString = fn.toString();
+            var fnString = _self._getFunctionId(fn, id);
 
             // If the named event object already exists in the dictionary...
             if (typeof _mappings[eventName] !== 'undefined')
@@ -188,11 +202,11 @@
             }
         };
 
-        _self.once = function (eventName, fn)
+        _self.once = function (eventName, fn, id)
         {
-            if (arguments.length !== 2)
+            if (arguments.length < 2 || arguments.length > 3)
             {
-                throw new ParamCountError('once', 'Expected 2 parameters', arguments.length);
+                throw new ParamCountError('once', 'Expected between 2 and 3 parameters', arguments.length);
             }
             else if (typeof eventName !== 'string')
             {
@@ -211,11 +225,16 @@
             {
                 throw new ParamTypeError('once', 'callback', fn, 'function');
             }
+            
+            if (typeof id !== 'undefined' && typeof id !== 'string')
+            {
+                throw new ParamTypeError('once', 'id', id, 'string');
+            }
 
-            _self.on(eventName, fn, true);
+            _self.on(eventName, fn, true, id);
         };
 
-        _self.off = function (eventName, fn)
+        _self.off = function (eventName, fn, id)
         {
             if (arguments.length === 0)
             {
@@ -241,11 +260,16 @@
                 // There is no mapping to remove, so return silently.
                 return;
             }
+            
+            if (typeof id !== 'undefined' && typeof id !== 'string')
+            {
+                throw new ParamTypeError('off', 'id', id, 'string');
+            }
 
             // Remove just the function, if passed as a parameter and in the dictionary.
             if (typeof fn === 'function')
             {
-                var fnString = fn.toString(),
+                var fnString = fnString = _self._getFunctionId(fn, id),
                     fnToRemove = _mappings[eventName].callbacks[fnString];
 
                 if (typeof fnToRemove !== 'undefined')
@@ -276,7 +300,7 @@
         };
 
         // Replace a single mapped callback for the specified event name with a new callback.
-        _self.replaceCallback = function (eventName, oldFn, newFn, once) {
+        _self.replaceCallback = function (eventName, oldFn, newFn, once, id) {
 
             if (typeof eventName !== 'string')
             {
@@ -310,12 +334,17 @@
                 throw new ParamTypeError('replaceCallback', 'once', once, 'boolean');
             }
             
-            _self.off(eventName, oldFn);
-            _self.on(eventName, newFn, once);
+            if (typeof id !== 'undefined' && typeof id !== 'string')
+            {
+                throw new ParamTypeError('replaceCallback', 'id', id, 'string');
+            }
+            
+            _self.off(eventName, oldFn, id);
+            _self.on(eventName, newFn, once, id);
         };
 
         // Replace all of the specified event name’s mapped callbacks with the specified callback.
-        _self.replaceAllCallbacks = function (eventName, newFn, once) {
+        _self.replaceAllCallbacks = function (eventName, newFn, once, id) {
 
             if (typeof eventName !== 'string')
             {
@@ -344,8 +373,13 @@
                 throw new ParamTypeError('replace', 'once', once, 'boolean');
             }
             
+            if (typeof id !== 'undefined' && typeof id !== 'string')
+            {
+                throw new ParamTypeError('replace', 'id', id, 'string');
+            }
+            
             _self.off(eventName);
-            _self.on(eventName, newFn, once);
+            _self.on(eventName, newFn, once, id);
         };
 
         _self.trigger = function (eventName, data)
