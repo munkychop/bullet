@@ -162,6 +162,30 @@ describe('Bullet', function () {
 
                 expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
             });
+            
+            it('should create different mappings for differnt ids when the same function is used', function () {
+                
+                var id1 = "id1";
+                var id2 = "id2";
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName]).to.be.an('undefined');
+
+                // Add an event.
+                this.bullet.on(this.testEventName, this.testCallback, false, id1);
+                this.bullet.on(this.testEventName, this.testCallback, false, id2);
+                
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                var testCallbackString1 = this.bullet._getFunctionId(this.testCallback, id1);
+                var testCallbackString2 = this.bullet._getFunctionId(this.testCallback, id2);
+                
+                expect(testCallbackString1).to.not.be.equal(testCallbackString2);
+
+                expect(mappings[this.testEventName].callbacks[testCallbackString1]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[testCallbackString2]).to.be.an('object');
+            });
 
             it('should throw a ParamTypeError if the event name param is not a string', function () {
 
@@ -200,8 +224,8 @@ describe('Bullet', function () {
                 // The map should still be empty
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
-
-            it('should throw a ParamTypeError if the callback parameter is not a function', function () {
+            
+             it('should throw a ParamTypeError if the id parameter is not a string', function () {
 
                 var self = this;
 
@@ -258,7 +282,7 @@ describe('Bullet', function () {
                 expect(this.bullet._getMappings()).to.deep.equal({});
             });
 
-            it('should throw a ParamCountError if more than three parameters are passed', function () {
+            it('should throw a ParamCountError if more than four parameters are passed', function () {
 
                 var self = this;
 
@@ -268,7 +292,7 @@ describe('Bullet', function () {
                 function callOn () {
 
                     // Attempt to map an event with more than three params.
-                    self.bullet.on(self.testEventName, self.testCallback, true, 123);
+                    self.bullet.on(self.testEventName, self.testCallback, true, 123, "test");
                 }
 
                 expect(callOn).to.throw(this.bullet._errors.ParamCountError);
