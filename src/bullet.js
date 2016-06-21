@@ -61,7 +61,7 @@
         UnmappedEventError.prototype.name = UnmappedEventError.name;
         UnmappedEventError.prototype.constructor = UnmappedEventError;
 
-
+        var CALLBACK_NAMESPACE = '__bullet_pubsub__';
         // ------------------------------------------------------------------------------------------
         // -- Private variables
         // ------------------------------------------------------------------------------------------
@@ -69,6 +69,7 @@
         var _mappings = {};
         var _strictMode = false;
         var _triggerAsync = true;
+        var _callbackIndex = 0;
 
         // Expose custom error type constructors (for testing), but use an underscore to imply privacy.
         _self._errors = {
@@ -155,15 +156,26 @@
                 throw new ParamTypeError('on', 'once', once, 'boolean');
             }
 
-            var fnString = fn.toString();
+            // Create a reference between the callback and stored event.
+            var id = _callbackIndex;
+
+            if (typeof fn[CALLBACK_NAMESPACE] === 'undefined')
+            {
+                fn[CALLBACK_NAMESPACE] = {}
+            }
+
+            // TODO : add tests for this.
+            fn[CALLBACK_NAMESPACE][eventName] = id;
+
+            _callbackIndex++;
 
             // If the named event object already exists in the dictionary...
             if (typeof _mappings[eventName] !== 'undefined')
             {
                 // Add a callback object to the named event object if one doesn't already exist.
-                if (typeof _mappings[eventName].callbacks[fnString] === 'undefined')
+                if (typeof _mappings[eventName].callbacks[id] === 'undefined')
                 {
-                    _mappings[eventName].callbacks[fnString] = {
+                    _mappings[eventName].callbacks[id] = {
                         cb : fn,
                         once : typeof once === 'boolean' ? once : false
                     };
@@ -173,7 +185,7 @@
                 else if (typeof once === 'boolean')
                 {
                     // The function already exists, so update it's 'once' value.
-                    _mappings[eventName].callbacks[fnString].once = once;
+                    _mappings[eventName].callbacks[id].once = once;
                 }
             }
             else
@@ -183,7 +195,7 @@
                     callbacks : {}
                 };
 
-                _mappings[eventName].callbacks[fnString] = {cb : fn, once : !!once};
+                _mappings[eventName].callbacks[id] = {cb : fn, once : !!once};
                 _mappings[eventName].totalCallbacks = 1;
             }
         };
@@ -245,13 +257,39 @@
             // Remove just the function, if passed as a parameter and in the dictionary.
             if (typeof fn === 'function')
             {
-                var fnString = fn.toString(),
-                    fnToRemove = _mappings[eventName].callbacks[fnString];
+                // Retrieve a reference to the stored event from the callback.
+                var id;
+
+                if (typeof fn[CALLBACK_NAMESPACE] === 'undefined')
+                {
+                    // if this is the case then there'll be no way to cross reference the store event/callback...
+                    // some tests are needed here.
+
+                    // TODO: Throw error here in strict mode.
+                }
+                else
+                {
+                    id = fn[CALLBACK_NAMESPACE][eventName];
+
+                    // TODO: Throw error/warning here if undefined?
+                }
+
+                // TODO : should we use a pool for id's? Probably not worthwhile, right?
+
+                var fnToRemove = _mappings[eventName].callbacks[id];
 
                 if (typeof fnToRemove !== 'undefined')
                 {
                     // delete the callback object from the dictionary.
-                    delete _mappings[eventName].callbacks[fnString];
+                    delete _mappings[eventName].callbacks[id];
+
+                    // delete the reference on the actual callback function.
+                    // TODO : add tests for this.
+                    delete fn[CALLBACK_NAMESPACE][eventName];
+
+
+                    // delete the Bullet namespace from the callback function if it is an empty object.
+                    // if (JSON.stringify(fn[CALLBACK_NAMESPACE]) === '{}') delete fn[CALLBACK_NAMESPACE];
                     
                     _mappings[eventName].totalCallbacks--;
 
@@ -372,9 +410,9 @@
             }
 
             function runCallback () {
-                for (var fnString in _mappings[eventName].callbacks)
+                for (var id in _mappings[eventName].callbacks)
                 {
-                    var callbackObject = _mappings[eventName].callbacks[fnString];
+                    var callbackObject = _mappings[eventName].callbacks[id];
 
                     if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
                     if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
