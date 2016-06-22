@@ -5,6 +5,7 @@ var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
 
 var BULLET_MODULE_PATH = '../../src/bullet';
+var BULLET_NAMESPACE = '__bullet_pubsub__';
 
 var expect = chai.expect;
 var bulletSingleton = require(BULLET_MODULE_PATH);
@@ -146,8 +147,10 @@ describe('Bullet', function () {
             it('should create a mapping for the specified event name', function () {
 
                 var mappings = this.bullet._getMappings();
+                var testCallbackId = 0;
 
                 expect(mappings[this.testEventName]).to.be.an('undefined');
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('undefined');
 
                 // Add an event.
                 this.bullet.on(this.testEventName, this.testCallback);
@@ -155,12 +158,102 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
 
+                // check that Bullet's internal map has a reference to the callback.
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[testCallbackId]).to.be.an('object');
+
+                // check that a reference to the mapped event has been added to the callback.
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(this.testCallback[BULLET_NAMESPACE].totalEvents).to.equal(1);
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.be.a('number');
+            });
+
+            it('should create mappings for different event names using the same callback', function () {
+
+                // TODO : define 'someOtherEventName' and 'someOtherCallback' in a 'before' block.
+                // (also update the others functions within the 'on()' block to use the 'before' version, i.e. this.someOtherEventName instead of just someOtherEventName)
+                var someOtherEventName = 'hey';
+                var someOtherCallback = function someOtherCallback () {};
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName]).to.be.an('undefined');
+                expect(mappings[someOtherEventName]).to.be.an('undefined');
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('undefined');
+                expect(someOtherCallback[BULLET_NAMESPACE]).to.be.an('undefined');
+
+                // Add some events.
+                this.bullet.on(this.testEventName, this.testCallback);
+                this.bullet.on(someOtherEventName, this.testCallback);
+
+                this.bullet.on(this.testEventName, someOtherCallback);
+                this.bullet.on(someOtherEventName, someOtherCallback);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
                 expect(mappings[this.testEventName]).to.be.an('object');
                 expect(mappings[this.testEventName].callbacks).to.be.an('object');
 
-                var testCallbackString = this.testCallback.toString();
+                expect(mappings[someOtherEventName]).to.be.an('object');
+                expect(mappings[someOtherEventName].callbacks).to.be.an('object');
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+                var testCallbackId = 0;
+                var someOtherCallbackId = 1;
+
+                expect(mappings[this.testEventName].callbacks[testCallbackId]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[someOtherCallbackId]).to.be.an('object');
+
+                expect(mappings[someOtherEventName].callbacks[testCallbackId]).to.be.an('object');
+                expect(mappings[someOtherEventName].callbacks[someOtherCallbackId]).to.be.an('object');
+
+                // check that references to the mapped events have been added to the callback.
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(this.testCallback[BULLET_NAMESPACE].totalEvents).to.equal(2);
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(testCallbackId);
+                expect(this.testCallback[BULLET_NAMESPACE][someOtherEventName]).to.equal(testCallbackId);
+
+                expect(someOtherCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(someOtherCallback[BULLET_NAMESPACE].totalEvents).to.equal(2);
+                expect(someOtherCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(someOtherCallbackId);
+                expect(someOtherCallback[BULLET_NAMESPACE][someOtherEventName]).to.equal(someOtherCallbackId);
+            });
+
+            it('should map multiple callbacks to a single event name', function () {
+
+                var someOtherCallback = function someOtherCallback () {};
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName]).to.be.an('undefined');
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('undefined');
+
+                // Add an event.
+                this.bullet.on(this.testEventName, this.testCallback);
+                this.bullet.on(this.testEventName, someOtherCallback);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[0]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[1]).to.be.an('object');
+
+                var testCallbackId = 0;
+                var someOtherCallbackId = 1;
+
+                expect(mappings[this.testEventName].callbacks[testCallbackId]).to.be.an('object');
+
+
+                // check that a reference to the mapped event has been added to the first callback.
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(this.testCallback[BULLET_NAMESPACE].totalEvents).to.equal(1);
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(testCallbackId);
+                
+                // check that a reference to the mapped event has been added to the second callback.
+                expect(someOtherCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(someOtherCallback[BULLET_NAMESPACE].totalEvents).to.equal(1);
+                expect(someOtherCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(someOtherCallbackId);
             });
 
             it('should throw a ParamTypeError if the event name param is not a string', function () {
@@ -284,6 +377,8 @@ describe('Bullet', function () {
 
                 this.someOtherEventName = 'toto';
                 this.someOtherCallback = function someOtherCallback () {};
+                this.testCallbackId = 0;
+                this.someOtherCallbackId = 1;
             });
 
             it('should remove a mapping only for the specified event name and function', function () {
@@ -292,14 +387,15 @@ describe('Bullet', function () {
                 this.bullet.on(this.testEventName, this.testCallback);
                 this.bullet.on(this.testEventName, this.someOtherCallback);
 
-                var testCallbackString = this.testCallback.toString();
-                var someOtherCallbackString = this.someOtherCallback.toString();
-
                 // Get the events map.
                 var mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('object');
+                expect(this.someOtherCallback[BULLET_NAMESPACE]).to.be.an('object');
+
 
                 // Remove the mapping to this.testCallback
                 this.bullet.off(this.testEventName, this.testCallback);
@@ -307,8 +403,11 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('undefined');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.testCallbackId]).to.be.an('undefined');
+                expect(mappings[this.testEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('undefined');
+                expect(this.someOtherCallback[BULLET_NAMESPACE]).to.be.an('object');
 
                 // Remove the mapping to this.someOtherCallback
                 this.bullet.off(this.testEventName, this.someOtherCallback);
@@ -318,6 +417,8 @@ describe('Bullet', function () {
 
                 // The map should be empty, now that all event mappings have been removed.
                 expect(mappings).to.deep.equal({});
+
+                expect(this.someOtherCallback[BULLET_NAMESPACE]).to.be.an('undefined');
             });
 
             it('should remove all mappings for the specified event name', function () {
@@ -329,16 +430,19 @@ describe('Bullet', function () {
                 this.bullet.on(this.someOtherEventName, this.testCallback);
                 this.bullet.on(this.someOtherEventName, this.someOtherCallback);
 
-                var testCallbackString = this.testCallback.toString();
-                var someOtherCallbackString = this.someOtherCallback.toString();
-
                 // Get the events map.
                 var mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
-                expect(mappings[this.someOtherEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.someOtherEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(this.testCallbackId);
+                expect(this.testCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.testCallbackId);
+                
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(this.someOtherCallbackId);
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.someOtherCallbackId);
 
                 // Remove all mappings for this.testEventName
                 this.bullet.off(this.testEventName);
@@ -347,8 +451,16 @@ describe('Bullet', function () {
                 mappings = this.bullet._getMappings();
 
                 expect(mappings[this.testEventName]).to.be.an('undefined');
-                expect(mappings[this.someOtherEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.someOtherEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+                
+                // All references to the specified event name should have been removed from testCallback and someOtherCallback.
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.be.an('undefined');
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.testEventName]).to.be.an('undefined');
+
+                // The other event – someOtherEventName – on these callbacks shouldn't be affected.
+                expect(this.testCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.testCallbackId);
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.someOtherCallbackId);
 
                 // Remove all mappings for this.someOtherEventName
                 this.bullet.off(this.someOtherEventName);
@@ -357,26 +469,32 @@ describe('Bullet', function () {
                 mappings = this.bullet._getMappings();
 
                 expect(mappings[this.someOtherEventName]).to.be.an('undefined');
+
+                // All references to bullet should have been removed from someOtherCallback.
+                expect(this.someOtherCallback[BULLET_NAMESPACE]).to.be.an('undefined');
             });
 
             it('should remove all mappings when no params are passed', function () {
 
-                // Create multiple event mappings so that we can test the removal of all mappings.
+                // Create multiple event mappings so that we can test the removal of all mappings
                 this.bullet.on(this.testEventName, this.testCallback);
                 this.bullet.on(this.testEventName, this.someOtherCallback);
                 this.bullet.on(this.someOtherEventName, this.testCallback);
                 this.bullet.on(this.someOtherEventName, this.someOtherCallback);
 
-                var testCallbackString = this.testCallback.toString();
-                var someOtherCallbackString = this.someOtherCallback.toString();
-
                 // Get the events map.
                 var mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
-                expect(mappings[this.someOtherEventName].callbacks[testCallbackString]).to.be.an('object');
-                expect(mappings[this.someOtherEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.testCallbackId]).to.be.an('object');
+                expect(mappings[this.someOtherEventName].callbacks[this.someOtherCallbackId]).to.be.an('object');
+
+                expect(this.testCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(this.testCallbackId);
+                expect(this.testCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.testCallbackId);
+                
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.testEventName]).to.equal(this.someOtherCallbackId);
+                expect(this.someOtherCallback[BULLET_NAMESPACE][this.someOtherEventName]).to.equal(this.someOtherCallbackId);
 
                 // Remove all mappings.
                 this.bullet.off();
@@ -385,6 +503,10 @@ describe('Bullet', function () {
                 mappings = this.bullet._getMappings();
 
                 expect(mappings).to.deep.equal({});
+
+                // All references should have been removed from testCallback and someOtherCallback.
+                expect(this.testCallback[BULLET_NAMESPACE]).to.be.an('undefined');
+                expect(this.someOtherCallback[BULLET_NAMESPACE]).to.be.an('undefined');
             });
 
             it('should throw an ParamTypeError if the event name param is not a string', function () {
