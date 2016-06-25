@@ -657,13 +657,11 @@ describe('Bullet', function () {
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                var testCallbackString = this.testCallback.toString();
-                var someOtherCallbackString = this.someOtherCallback.toString();
-
                 // Get the events map.
                 var mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].totalCallbacks).to.equal(1);
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.testCallback);
 
                 // Replace the 'this.testCallback' mapping with a mapping for 'this.someOtherCallback'
                 this.bullet.replaceCallback(this.testEventName, this.testCallback, this.someOtherCallback);
@@ -671,8 +669,8 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
 
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('undefined');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].totalCallbacks).to.equal(1);
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.someOtherCallback);
             });
 
             it('should respect the ‘once’ parameter when replacing mapped functions', function () {
@@ -688,10 +686,7 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 var mappings = this.bullet._getMappings();
 
-                var someOtherCallbackString = this.someOtherCallback.toString();
-
-                expect(mappings[this.testEventName]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString].once).to.equal(true);
+                expect(mappings[this.testEventName].callbacks[0].once).to.equal(true);
             });
         }); // [replace]
 
@@ -779,23 +774,49 @@ describe('Bullet', function () {
                 expect(callReplaceAllCallbacks).to.throw(this.bullet._errors.UnmappedEventError);
             });
 
-            it('should respect the ‘once’ parameter when replacing all mapped functions', function () {
+            it('should replace all functions mapped to the specified event with a single function', function () {
 
-                var self = this;
+                var thirdCallback = function thirdCallback () {};
+                var newCallback = function newCallback () {};
+                
+                // Create multiple event mappings.
+                this.bullet.on(this.testEventName, this.testCallback);
+                this.bullet.on(this.testEventName, this.someOtherCallback);
+                this.bullet.on(this.testEventName, thirdCallback);
+
+                // Get the events map.
+                var mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName].totalCallbacks).to.equal(3);
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.testCallback);
+                expect(mappings[this.testEventName].callbacks[1].cb).to.equal(this.someOtherCallback);
+                expect(mappings[this.testEventName].callbacks[2].cb).to.equal(thirdCallback);
+
+                // Replace all mapped callbacks with the 'newCallback'.
+                this.bullet.replaceAllCallbacks(this.testEventName, newCallback);
+
+                // Get the updated events map.
+                mappings = this.bullet._getMappings();
+
+                expect(mappings[this.testEventName].totalCallbacks).to.equal(1);
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(newCallback);
+                expect(mappings[this.testEventName].callbacks[1]).to.be.an('undefined');
+                expect(mappings[this.testEventName].callbacks[2]).to.be.an('undefined');
+            });
+
+            it('should respect the ‘once’ parameter when replacing all mapped functions', function () {
 
                 // Create an event mapping.
                 this.bullet.on(this.testEventName, this.testCallback);
 
-                // update the function mapped to the testEventName and set the 'once' param for the new function.
-                self.bullet.replaceAllCallbacks(self.testEventName, self.someOtherCallback, true);
+                // Update the function mapped to the testEventName and set the 'once' param for the new function.
+                this.bullet.replaceAllCallbacks(this.testEventName, this.someOtherCallback, true);
 
                 // Get the updated events map.
                 var mappings = this.bullet._getMappings();
-                
-                var someOtherCallbackString = this.someOtherCallback.toString();
 
-                expect(mappings[this.testEventName]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[someOtherCallbackString].once).to.equal(true);
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.someOtherCallback);
+                expect(mappings[this.testEventName].callbacks[0].once).to.equal(true);
             });
         }); // [replaceAllCallbacks]
 
@@ -1269,10 +1290,8 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
 
-                var testCallbackString = this.testCallback.toString();
-
                 expect(mappings[this.testEventName]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.testCallback);
             });
         }); // [on] (strict mode)
 
@@ -1456,10 +1475,8 @@ describe('Bullet', function () {
                 // Get the updated events map.
                 mappings = this.bullet._getMappings();
 
-                var testCallbackString = this.testCallback.toString();
-
                 expect(mappings[this.testEventName]).to.be.an('object');
-                expect(mappings[this.testEventName].callbacks[testCallbackString]).to.be.an('object');
+                expect(mappings[this.testEventName].callbacks[0].cb).to.equal(this.testCallback);
             });
         }); // [once] (strict mode)
         
