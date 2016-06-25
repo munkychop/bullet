@@ -61,7 +61,7 @@
         UnmappedEventError.prototype.name = UnmappedEventError.name;
         UnmappedEventError.prototype.constructor = UnmappedEventError;
 
-
+        var _CALLBACK_NAMESPACE = '__bullet_pubsub__';
         // ------------------------------------------------------------------------------------------
         // -- Private variables
         // ------------------------------------------------------------------------------------------
@@ -89,6 +89,16 @@
         // ------------------------------------------------------------------------------------------
         // -- Private methods
         // ------------------------------------------------------------------------------------------
+        function _runCallback (eventName, data) {
+            for (var id in _mappings[eventName].callbacks)
+            {
+                var callbackObject = _mappings[eventName].callbacks[id];
+
+                if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
+                if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
+            }
+        }
+
         function _cloneCallbacks (callbacks) {
             var clonedCallbacks = {};
 
@@ -101,6 +111,33 @@
             }
 
             return clonedCallbacks;
+        }
+
+        function _deleteAllCallbackReferencesForEvent (eventName)
+        {
+            for (var id in _mappings[eventName].callbacks)
+            {
+                var callback = _mappings[eventName].callbacks[id].cb;
+
+                callback[_CALLBACK_NAMESPACE].totalEvents--;
+
+                if (callback[_CALLBACK_NAMESPACE].totalEvents === 0)
+                {
+                    delete callback[_CALLBACK_NAMESPACE];
+                }
+                else
+                {
+                    delete callback[_CALLBACK_NAMESPACE][eventName];
+                }
+            }
+        }
+
+        function _deleteAllCallbackReferences ()
+        {
+            for (var eventName in _mappings)
+            {
+                _deleteAllCallbackReferencesForEvent(eventName);
+            }
         }
 
         // Expose _getMappings method (for testing), but use an underscore to imply privacy.
@@ -155,25 +192,44 @@
                 throw new ParamTypeError('on', 'once', once, 'boolean');
             }
 
-            var fnString = fn.toString();
+            // Create a reference between the callback and stored event.
+            var callbackId = null;
 
             // If the named event object already exists in the dictionary...
             if (typeof _mappings[eventName] !== 'undefined')
             {
-                // Add a callback object to the named event object if one doesn't already exist.
-                if (typeof _mappings[eventName].callbacks[fnString] === 'undefined')
+                // Attempt to get the callback ID from the callback itself.
+                if (typeof fn[_CALLBACK_NAMESPACE] === 'undefined')
                 {
-                    _mappings[eventName].callbacks[fnString] = {
+                    fn[_CALLBACK_NAMESPACE] = {
+                        totalEvents: 0
+                    };
+                }
+                
+                // Add a new callback object to the existing event object.
+                if (typeof fn[_CALLBACK_NAMESPACE][eventName] === 'undefined')
+                {
+                    callbackId = _mappings[eventName].totalCallbacks;
+
+                    _mappings[eventName].totalCallbacks++;
+
+                    _mappings[eventName].callbacks[callbackId] = {
                         cb : fn,
                         once : typeof once === 'boolean' ? once : false
                     };
 
-                    _mappings[eventName].totalCallbacks++;
+                    // On the callback, create a reference to the event mapping.
+                    fn[_CALLBACK_NAMESPACE][eventName] = callbackId;
+                    fn[_CALLBACK_NAMESPACE].totalEvents++;
                 }
-                else if (typeof once === 'boolean')
+
+                if (typeof once === 'boolean')
                 {
+                    // Get the callback ID from the value of the existing event name key.
+                    callbackId = fn[_CALLBACK_NAMESPACE][eventName];
+
                     // The function already exists, so update it's 'once' value.
-                    _mappings[eventName].callbacks[fnString].once = once;
+                    _mappings[eventName].callbacks[callbackId].once = once;
                 }
             }
             else
@@ -183,8 +239,23 @@
                     callbacks : {}
                 };
 
-                _mappings[eventName].callbacks[fnString] = {cb : fn, once : !!once};
+                callbackId = 0;
+
+                _mappings[eventName].callbacks[callbackId] = {cb : fn, once : !!once};
                 _mappings[eventName].totalCallbacks = 1;
+
+                // On the callback, create a reference to the event mapping.
+                if (typeof fn[_CALLBACK_NAMESPACE] === 'undefined')
+                {
+                    fn[_CALLBACK_NAMESPACE] = {};
+                    fn[_CALLBACK_NAMESPACE].totalEvents = 1;
+                }
+                else
+                {
+                    fn[_CALLBACK_NAMESPACE].totalEvents++;
+                }
+                
+                fn[_CALLBACK_NAMESPACE][eventName] = callbackId;
             }
         };
 
@@ -219,8 +290,12 @@
         {
             if (arguments.length === 0)
             {
-                // Remove all mappings.
+                // delete all references to Bullet that exist on mapped callbacks.
+                _deleteAllCallbackReferences();
+
+                // Remove all mappings from the dictionary.
                 _mappings = {};
+
                 return;
             }
             else if (typeof eventName !== 'string')
@@ -245,21 +320,38 @@
             // Remove just the function, if passed as a parameter and in the dictionary.
             if (typeof fn === 'function')
             {
-                var fnString = fn.toString(),
-                    fnToRemove = _mappings[eventName].callbacks[fnString];
+                // if (typeof fn[_CALLBACK_NAMESPACE] === 'undefined' || typeof fn[_CALLBACK_NAMESPACE][eventName] === 'undefined')
+                // {
+                //     // TODO: Throw error here if in strict mode.
+                // }
+
+                // Retrieve a reference to the stored event from the callback.
+                var id = fn[_CALLBACK_NAMESPACE][eventName];
+                var fnToRemove = _mappings[eventName].callbacks[id];
 
                 if (typeof fnToRemove !== 'undefined')
                 {
                     // delete the callback object from the dictionary.
-                    delete _mappings[eventName].callbacks[fnString];
-                    
+                    delete _mappings[eventName].callbacks[id];
+
+                    // delete the event reference on the callback function.
+                    delete fn[_CALLBACK_NAMESPACE][eventName];
+
                     _mappings[eventName].totalCallbacks--;
+                    fn[_CALLBACK_NAMESPACE].totalEvents--;
 
                     if (_mappings[eventName].totalCallbacks === 0)
                     {
                         // There are no more functions in the dictionary that are
                         // registered to this event, so delete the named event object.
                         delete _mappings[eventName];
+                    }
+
+                    if (fn[_CALLBACK_NAMESPACE].totalEvents === 0)
+                    {
+                        // There are no more events registered on this callback,
+                        // so delete the Bullet namespace.
+                        delete fn[_CALLBACK_NAMESPACE];
                     }
                 }
             }
@@ -269,8 +361,14 @@
             }
             else
             {
-                // No callback was passed, so delete all functions in the dictionary that
-                // are registered to this event by deleting the named event object.
+                // No callback was passed to the 'off' method...
+
+                // For each callback in _mappings[eventName], delete the reference to
+                // the specified event name on the callback itself.
+                _deleteAllCallbackReferencesForEvent(eventName);
+
+                // Delete all functions in the dictionary that are registered to this
+                // event by deleting the named event object.
                 delete _mappings[eventName];
             }
         };
@@ -371,24 +469,16 @@
                 return;
             }
 
-            function runCallback () {
-                for (var fnString in _mappings[eventName].callbacks)
-                {
-                    var callbackObject = _mappings[eventName].callbacks[fnString];
-
-                    if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
-                    if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
-                }
-            }
-
             // Check whether or not this is a browser environment.
             if (_triggerAsync && typeof window !== 'undefined')
             {
-                window.setTimeout(runCallback, 0);
+                window.setTimeout(function(){
+                    _runCallback(eventName, data);
+                }, 0);
             }
             else
             {
-                runCallback();
+                _runCallback(eventName, data);
             }
         };
 
@@ -444,7 +534,7 @@
             if (typeof useAsync !== 'boolean') throw new ParamTypeError('setTriggerAsync', 'trigger async', useAsync, 'boolean');
 
             _triggerAsync = useAsync;
-        }
+        };
 
         // TODO : Create an 'addMultipleEventNames' method with an array of strings passed as a param.
         // - include type checks for string while looping over the array.
