@@ -1,9 +1,15 @@
 {
     "extends": "../.jshintrc",
 
+    "browser"       : false,
+    "mocha"         : true,
+
     // Custom Globals
     "globals"       : {
 
-        "expect"   : true
+        "expect"             : true,
+        "chai"               : true,
+        "sinon"              : true,
+        "BULLET_NAMESPACE"   : true
     }
 }

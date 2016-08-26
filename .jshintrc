@@ -64,14 +64,10 @@
 
     // Environments
     "browser"       : true,
-    "mocha"         : true,
     "node"          : true,
 
     // Custom Globals
     "globals"       : {
-
-        "BULLET_NAMESPACE"   : true,
-        "chai"               : true,
-        "sinon"              : true
+        "define"        : true
     }
 }
