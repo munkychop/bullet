@@ -41,9 +41,7 @@
     "boss"          : false,    // true: Tolerate assignments where comparisons would be expected
     "debug"         : false,    // true: Allow debugger statements e.g. browser breakpoints.
     "eqnull"        : false,    // true: Tolerate use of `== null`
-    "es5"           : false,    // true: Allow ES5 syntax (ex: getters and setters)
-    "esnext"        : false,    // true: Allow ES.next (ES6) syntax (ex: `const`)
-    "moz"           : false,    // true: Allow Mozilla specific syntax (extends and overrides esnext features)
+    "esversion"     : 5,
                                 // (ex: `for each`, multiple try/catch, function expression…)
     "evil"          : false,    // true: Tolerate use of `eval` and `new Function()`
     "expr"          : false,    // true: Tolerate `ExpressionStatement` as Programs
@@ -65,28 +63,15 @@
     "validthis"     : false,    // true: Tolerate using this in a non-constructor function
 
     // Environments
-    "browser"       : true,     // Web Browser (window, document, etc)
-    "browserify"    : false,    // Browserify (node.js code in the browser)
-    "couch"         : false,    // CouchDB
-    "devel"         : true,     // Development/debugging (alert, confirm, etc)
-    "dojo"          : false,    // Dojo Toolkit
-    "jasmine"       : false,    // Jasmine
-    "jquery"        : false,    // jQuery
-    "mocha"         : true,     // Mocha
-    "mootools"      : false,    // MooTools
-    "node"          : true,     // Node.js
-    "nonstandard"   : false,    // Widely adopted globals (escape, unescape, etc)
-    "prototypejs"   : false,    // Prototype and Scriptaculous
-    "qunit"         : false,    // QUnit
-    "rhino"         : false,    // Rhino
-    "shelljs"       : false,    // ShellJS
-    "worker"        : false,    // Web Workers
-    "wsh"           : false,    // Windows Scripting Host
-    "yui"           : false,     // Yahoo User Interface
+    "browser"       : true,
+    "mocha"         : true,
+    "node"          : true,
 
     // Custom Globals
     "globals"       : {
 
-        "define"   : true // AMD support
+        "BULLET_NAMESPACE"   : true,
+        "chai"               : true,
+        "sinon"              : true
     }
 }
