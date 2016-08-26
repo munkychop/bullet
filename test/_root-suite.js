@@ -9,7 +9,7 @@ global.BULLET_NAMESPACE = '__bullet_pubsub__';
 var sinonChai = require('sinon-chai');
 chai.use(sinonChai);
 
-var bulletSingleton = require('../../src/bullet');
+var bulletSingleton = require('../src/bullet');
 var BulletClass = bulletSingleton.constructor;
 
 
