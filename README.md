@@ -582,6 +582,20 @@ Bullet.trigger('hello');
 ----------
 
 
+#### **.addMultipleEventNames()**
+
+```javascript
+Bullet.addMultipleEventNames(['someMessage', 'someOtherMessage']);
+```
+
+Explicitly add one or more messages to Bullet’s 'events' object. **_Explicitly defined message names are required when strict mode is enabled._**
+
+This method works in the same way as the `addEventName` method, but instead accepts an array of message names.
+
+
+----------
+
+
 #### **.removeEventName()**
 
 ```javascript
