@@ -9,8 +9,10 @@
     "url": "http://www.ivanhayes.com"
   },
   "main": "dist/bullet.js",
-  "scripts": { 
-    "test" : "grunt test"
+  "scripts": {
+    "test": "grunt test",
+    "start": "grunt",
+    "dist": "grunt dist"
   },
   "repository": {
     "type": "git",
