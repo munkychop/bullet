@@ -2,7 +2,7 @@
 
 describe('addEventName()', function () {
 
-    it('should add an event to the internal "_strictEvents" object', function () {
+    it('should add an event to the public "events" object', function () {
 
         var events = this.bullet.events;
         
@@ -32,21 +32,21 @@ describe('addEventName()', function () {
 
         var self = this;
 
-        function calladdEventName () {
+        function callAddEventName () {
             self.bullet.addEventName({hello : 'hi'});
         }
 
-        expect(calladdEventName).to.throw(this.bullet._errors.ParamTypeError);
+        expect(callAddEventName).to.throw(this.bullet._errors.ParamTypeError);
     });
 
     it('should throw an EventNameLengthError if the passed string parameter length is 0', function () {
 
         var self = this;
 
-        function calladdEventName () {
+        function callAddEventName () {
             self.bullet.addEventName('');
         }
 
-        expect(calladdEventName).to.throw(this.bullet._errors.EventNameLengthError);
+        expect(callAddEventName).to.throw(this.bullet._errors.EventNameLengthError);
     });
 });

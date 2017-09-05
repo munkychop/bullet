@@ -34,6 +34,10 @@ describe('Method Existence', function () {
         expect(this.bullet.addEventName).to.be.a('function');
     });
 
+    it('should have a public method named "addMultipleEventNames"', function () {
+        expect(this.bullet.addMultipleEventNames).to.be.a('function');
+    });
+
     it('should have a public method named "removeEventName"', function () {
         expect(this.bullet.removeEventName).to.be.a('function');
     });

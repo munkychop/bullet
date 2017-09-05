@@ -37,6 +37,15 @@
         EventNameLengthError.prototype.name = EventNameLengthError.name;
         EventNameLengthError.prototype.constructor = EventNameLengthError;
 
+        function EventNamesArrayLengthError (methodName) {
+            
+            this.message = 'Bullet:: [' + methodName + '] Expected event names array to contain one or more event names';
+            var error = new Error(this.message);
+            if (typeof error.stack !== 'undefined') this.stack = error.stack;
+        }
+        EventNamesArrayLengthError.prototype = new Error();
+        EventNamesArrayLengthError.prototype.name = EventNamesArrayLengthError.name;
+        EventNamesArrayLengthError.prototype.constructor = EventNamesArrayLengthError;
 
         function UndeclaredEventError (methodName, eventName) {
             
@@ -75,6 +84,7 @@
             ParamCountError : ParamCountError,
             ParamTypeError : ParamTypeError,
             EventNameLengthError : EventNameLengthError,
+            EventNamesArrayLengthError: EventNamesArrayLengthError,
             UndeclaredEventError : UndeclaredEventError,
             UnmappedEventError : UnmappedEventError,
         };
@@ -495,6 +505,27 @@
 
             _self.events[eventName] = eventName;
         };
+
+        _self.addMultipleEventNames = function (eventNames) {
+            
+            if (!(eventNames instanceof Array))
+            {
+                throw new ParamTypeError('addMultipleEventNames', 'event names', eventNames, 'array');
+            }
+            else if (eventNames.length === 0)
+            {
+                throw new EventNamesArrayLengthError('addMultipleEventNames');
+            }
+
+            var i = 0;
+            var length = eventNames.length;
+
+            for(i; i < length; i++) {
+                var currentEventName = eventNames[i];
+                
+                _self.addEventName(currentEventName);
+            }
+        }
 
         _self.removeEventName = function (eventName) {
 

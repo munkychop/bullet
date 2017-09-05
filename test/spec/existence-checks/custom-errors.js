@@ -14,6 +14,10 @@ describe('Custom Error Existence', function () {
         expect(this.bullet._errors.EventNameLengthError).to.be.a('function');
     });
 
+    it('should have custom error type "EventNamesArrayLengthError"', function () {
+        expect(this.bullet._errors.EventNamesArrayLengthError).to.be.a('function');
+    });
+
     it('should have custom error type "UndeclaredEventError"', function () {
         expect(this.bullet._errors.UndeclaredEventError).to.be.a('function');
     });
