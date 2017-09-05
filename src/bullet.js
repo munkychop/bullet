@@ -567,9 +567,6 @@
             _triggerAsync = useAsync;
         };
 
-        // TODO : Create an 'addMultipleEventNames' method with an array of strings passed as a param.
-        // - include type checks for string while looping over the array.
-
         // TODO : Create a 'replaceAllEventNames' method with an array of strings passed as a param.
         // - include type checks for string while looping over the array.
 
