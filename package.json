@@ -39,6 +39,7 @@
     "grunt-contrib-uglify": "^0.9.1",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-simple-mocha": "^0.4.0",
+    "jshint": "^2.9.5",
     "load-grunt-tasks": "^3.2.0",
     "sinon": "^1.16.1",
     "sinon-chai": "^2.8.0"
