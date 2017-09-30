@@ -10,9 +10,11 @@
   },
   "main": "dist/bullet.js",
   "scripts": {
-    "test": "grunt test",
-    "start": "grunt",
-    "dist": "grunt dist"
+    "test": "mocha test/**/*.js",
+    "lint": "eslint src/bullet.js",
+    "watch": "gulp",
+    "start": "npm run test && npm run watch",
+    "dist": "npm run lint && npm run test && gulp compile"
   },
   "repository": {
     "type": "git",
@@ -32,15 +34,15 @@
   "private": false,
   "license": "MIT",
   "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
     "chai": "^3.0.0",
     "eslint": "^4.8.0",
-    "grunt": "^0.4.5",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-copy": "^0.8.0",
-    "grunt-contrib-uglify": "^0.9.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-simple-mocha": "^0.4.0",
-    "load-grunt-tasks": "^3.2.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0",
+    "mocha": "^3.5.3",
+    "pump": "^1.0.2",
     "sinon": "^1.16.1",
     "sinon-chai": "^2.8.0"
   }
