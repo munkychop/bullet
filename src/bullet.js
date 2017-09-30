@@ -11,36 +11,28 @@
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        ParamCountError.prototype = new Error();
-        ParamCountError.prototype.name = ParamCountError.name;
-        ParamCountError.prototype.constructor = ParamCountError;
+        setupCustomError(ParamCountError);
 
         function ParamTypeError (methodName, parameterName, parameter, expectedType) {
             this.message = 'Bullet:: [' + methodName + '] Expected parameter - ' + parameterName + ' - to be type: ' + expectedType + ', but received type: ' + typeof parameter;
             var error = new TypeError(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        ParamTypeError.prototype = new TypeError();
-        ParamTypeError.prototype.name = ParamTypeError.name;
-        ParamTypeError.prototype.constructor = ParamTypeError;
+        setupCustomError(ParamTypeError);
 
         function EventNameLengthError (methodName) {
             this.message = 'Bullet:: [' + methodName + '] Expected event name parameter to be longer than 0 characters';
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        EventNameLengthError.prototype = new Error();
-        EventNameLengthError.prototype.name = EventNameLengthError.name;
-        EventNameLengthError.prototype.constructor = EventNameLengthError;
+        setupCustomError(EventNameLengthError);
 
         function EventNamesArrayLengthError (methodName) {
             this.message = 'Bullet:: [' + methodName + '] Expected event names array to contain one or more event names';
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        EventNamesArrayLengthError.prototype = new Error();
-        EventNamesArrayLengthError.prototype.name = EventNamesArrayLengthError.name;
-        EventNamesArrayLengthError.prototype.constructor = EventNamesArrayLengthError;
+        setupCustomError(EventNamesArrayLengthError);
 
         function UndeclaredEventError (methodName, eventName) {
             this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" does not exist within the events dictionary\nPlease use the Bullet.addEventName method to add this string.';
@@ -48,10 +40,7 @@
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        UndeclaredEventError.prototype = new Error();
-        UndeclaredEventError.prototype.name = UndeclaredEventError.name;
-        UndeclaredEventError.prototype.constructor = UndeclaredEventError;
-
+        setupCustomError(UndeclaredEventError);
 
         function UnmappedEventError (methodName, eventName) {
             this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" is not mapped to any callbacks\nPlease use the Bullet.on method to map this string to a callback.';
@@ -59,9 +48,13 @@
             var error = new Error(this.message);
             if (typeof error.stack !== 'undefined') this.stack = error.stack;
         }
-        UnmappedEventError.prototype = new Error();
-        UnmappedEventError.prototype.name = UnmappedEventError.name;
-        UnmappedEventError.prototype.constructor = UnmappedEventError;
+        setupCustomError(UnmappedEventError);
+
+        function setupCustomError (CustomError) {
+            CustomError.prototype = new Error();
+            CustomError.prototype.name = CustomError.name;
+            CustomError.prototype.constructor = CustomError;
+        }
 
         var _CALLBACK_NAMESPACE = '__bullet_pubsub__';
         // ------------------------------------------------------------------------------------------
