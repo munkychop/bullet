@@ -75,7 +75,7 @@
     "guard-for-in": "off",
     "handle-callback-err": "error",
     "id-blacklist": "error",
-    "id-length": "error",
+    "id-length": ["error", { "exceptions": ["i"] }],
     "id-match": "error",
     "indent": "off",
     "indent-legacy": "off",
