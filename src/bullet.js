@@ -402,7 +402,7 @@
 
       // Check whether or not this is a browser environment.
       if (_triggerAsync && typeof window !== 'undefined') {
-        window.setTimeout(function(){
+        window.setTimeout(function () {
           _runCallback(eventName, data);
         }, 0);
       }
@@ -499,7 +499,7 @@
 
   if (typeof define !== 'undefined' && define.amd) {
       // AMD. Register as an anonymous module.
-      define(function() {
+      define(function () {
           return new Bullet();
       });
   }
