@@ -453,7 +453,7 @@
 
     _self.getStrictMode = function () {
       // Return a boolean that doesn't directly point to the internal '_strictMode' property.
-      return _strictMode === true ? true : false;
+      return _strictMode === true;
     };
 
     _self.setStrictMode = function (useStrictMode) {
@@ -466,7 +466,7 @@
 
     _self.getTriggerAsync = function () {
       // Return a boolean that doesn't directly point to the internal '_triggerAsync' property.
-      return _triggerAsync === true ? true : false;
+      return _triggerAsync === true;
     };
 
     _self.setTriggerAsync = function (useAsync) {
