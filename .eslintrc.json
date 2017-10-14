@@ -133,7 +133,6 @@
       }
     ],
     "no-floating-decimal": "error",
-    "no-implicit-coercion": "error",
     "no-implicit-globals": "error",
     "no-implied-eval": "error",
     "no-inline-comments": "error",
