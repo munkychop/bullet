@@ -6,28 +6,28 @@
     // ------------------------------------------------------------------------------------------
     function ParamCountError (methodName, expectedParamsString, paramCount) {
       this.message = 'Bullet:: [' + methodName + '] ' + expectedParamsString + ', but received: ' + paramCount;
-      var error = new Error(this.message);
+      const error = new Error(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(ParamCountError);
 
     function ParamTypeError (methodName, parameterName, parameter, expectedType) {
       this.message = 'Bullet:: [' + methodName + '] Expected parameter - ' + parameterName + ' - to be type: ' + expectedType + ', but received type: ' + typeof parameter;
-      var error = new TypeError(this.message);
+      const error = new TypeError(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(ParamTypeError);
 
     function EventNameLengthError (methodName) {
       this.message = 'Bullet:: [' + methodName + '] Expected event name parameter to be longer than 0 characters';
-      var error = new Error(this.message);
+      const error = new Error(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(EventNameLengthError);
 
     function EventNamesArrayLengthError (methodName) {
       this.message = 'Bullet:: [' + methodName + '] Expected event names array to contain one or more event names';
-      var error = new Error(this.message);
+      const error = new Error(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(EventNamesArrayLengthError);
@@ -35,7 +35,7 @@
     function UndeclaredEventError (methodName, eventName) {
       this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" does not exist within the events dictionary\nPlease use the Bullet.addEventName method to add this string.';
 
-      var error = new Error(this.message);
+      const error = new Error(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(UndeclaredEventError);
@@ -43,7 +43,7 @@
     function UnmappedEventError (methodName, eventName) {
       this.message = 'Bullet:: [' + methodName + '] Event string: "' + eventName + '" is not mapped to any callbacks\nPlease use the Bullet.on method to map this string to a callback.';
 
-      var error = new Error(this.message);
+      const error = new Error(this.message);
       if (typeof error.stack !== 'undefined') this.stack = error.stack;
     }
     setupCustomError(UnmappedEventError);
@@ -54,14 +54,14 @@
       CustomError.prototype.constructor = CustomError;
     }
 
-    var _CALLBACK_NAMESPACE = '__bullet_pubsub__';
+    const _CALLBACK_NAMESPACE = '__bullet_pubsub__';
     // ------------------------------------------------------------------------------------------
     // -- Private variables
     // ------------------------------------------------------------------------------------------
-    var _self = this;
-    var _mappings = {};
-    var _strictMode = false;
-    var _triggerAsync = true;
+    const _self = this;
+    let _mappings = {};
+    let _strictMode = false;
+    let _triggerAsync = true;
 
     // Expose custom error type constructors (for testing), but use an underscore to imply privacy.
     _self._errors = {
@@ -84,8 +84,8 @@
     // -- Private methods
     // ------------------------------------------------------------------------------------------
     function _runCallback (eventName, data) {
-      for (var id in _mappings[eventName].callbacks) {
-        var callbackObject = _mappings[eventName].callbacks[id];
+      for (const id in _mappings[eventName].callbacks) {
+        const callbackObject = _mappings[eventName].callbacks[id];
 
         if (typeof callbackObject.cb === 'function') callbackObject.cb(data);
         if (typeof callbackObject.once === 'boolean' && callbackObject.once === true) _self.off(eventName, callbackObject.cb);
@@ -93,9 +93,9 @@
     }
 
     function _cloneCallbacks (callbacks) {
-      var clonedCallbacks = {};
+      const clonedCallbacks = {};
 
-      for (var callbackName in callbacks) {
+      for (const callbackName in callbacks) {
         clonedCallbacks[callbackName] = {
           cb : callbacks[callbackName].cb,
           once : callbacks[callbackName].once
@@ -106,8 +106,8 @@
     }
 
     function _deleteAllCallbackReferencesForEvent (eventName) {
-      for (var id in _mappings[eventName].callbacks) {
-        var callback = _mappings[eventName].callbacks[id].cb;
+      for (const id in _mappings[eventName].callbacks) {
+        const callback = _mappings[eventName].callbacks[id].cb;
 
         callback[_CALLBACK_NAMESPACE].totalEvents--;
 
@@ -121,7 +121,7 @@
     }
 
     function _deleteAllCallbackReferences () {
-      for (var eventName in _mappings) {
+      for (const eventName in _mappings) {
         _deleteAllCallbackReferencesForEvent(eventName);
       }
     }
@@ -130,9 +130,9 @@
     _self._getMappings = function () {
       // Return a dictionary object that has no effect on app state to ensure '_mappings'
       // stays private, even if the value returned from this method is modified.
-      var clonedMappings = {};
+      const clonedMappings = {};
 
-      for (var mapping in _mappings) {             
+      for (const mapping in _mappings) {             
         clonedMappings[mapping] = {
           callbacks : _cloneCallbacks(_mappings[mapping].callbacks),
           totalCallbacks : _mappings[mapping].totalCallbacks
@@ -170,7 +170,7 @@
       }
 
       // Create a reference between the callback and stored event.
-      var callbackId = null;
+      let callbackId = null;
 
       // If the named event object already exists in the dictionary...
       if (typeof _mappings[eventName] !== 'undefined') {
@@ -282,8 +282,8 @@
         // }
 
         // Retrieve a reference to the stored event from the callback.
-        var id = fn[_CALLBACK_NAMESPACE][eventName];
-        var fnToRemove = _mappings[eventName].callbacks[id];
+        const id = fn[_CALLBACK_NAMESPACE][eventName];
+        const fnToRemove = _mappings[eventName].callbacks[id];
 
         if (typeof fnToRemove !== 'undefined') {
           // delete the callback object from the dictionary.
@@ -430,11 +430,11 @@
         throw new EventNamesArrayLengthError('addMultipleEventNames');
       }
 
-      var i = 0;
-      var length = eventNames.length;
+      let i = 0;
+      const length = eventNames.length;
 
       for (i; i < length; i++) {
-        var currentEventName = eventNames[i];
+        const currentEventName = eventNames[i];
 
         _self.addEventName(currentEventName);
       }
